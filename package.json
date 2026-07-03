@@ -1,0 +1,18 @@
+{
+  "name": "zucity-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for ZuCity Japan bookings — search, availability, quotes, ready-to-sign purchase calldata, forms, referrals. Keyless by design.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "zucity-mcp": "./zucity-mcp.js" },
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node zucity-mcp.js",
+    "smoke": "node zucity-mcp.js --selftest"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "viem": "^2.21.0",
+    "zod": "^3.24.0"
+  }
+}

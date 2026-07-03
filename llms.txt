@@ -1,0 +1,29 @@
+# ZuCity Japan — Booking API & Agent Toolkit
+
+> Integration docs and tools for booking ZuCity Japan's curated registry of coliving rooms, villas, venues, event tickets, and memberships in rural Japan. Agents can search inventory, check real availability, quote discounted prices, assemble onchain purchases (USDC on Ethereum; receipts are ERC-721 NFTs), create card checkouts, submit applications, and earn instant onchain referral splits.
+
+Two rules keep you correct: (1) REST metadata is for discovery — prices/managers there can drift; the chain (or `/api/calendars?format=json`) is the transaction truth. (2) Everything in these docs was verified against live systems on the stamped date; drift-prone numbers ship with inline verify commands and a machine-readable facts file.
+
+## Docs
+
+- [skills.md](https://raw.githubusercontent.com/zucity/api-docs/main/skills.md): agent operating manual — capability boundaries, the 5 workflows (search, onchain buy, card checkout, applications, referrals), decision rules, guardrails
+- [api.md](https://raw.githubusercontent.com/zucity/api-docs/main/api.md): full HTTP reference — REST endpoints, tRPC-over-HTTP, auth model, rate limits, Stripe checkout contract, use cases (personal trip / group retreat / popup city), verified NOT-SUPPORTED list
+- [contracts.md](https://raw.githubusercontent.com/zucity/api-docs/main/contracts.md): smart contract integration — addresses (mainnet production + Sepolia sandbox), Receipt struct, date encoding, availability, quoting, purchase chronology, receipt lifecycle, referral fees, errors
+- [facts.json](https://raw.githubusercontent.com/zucity/api-docs/main/facts.json): machine-readable ground truth — addresses, enums, limits, endpoints, verified live samples
+
+## Live endpoints
+
+- [Inventory search](https://zucity.org/api/inventory): GET, no auth — 142 curated items, filterable by itemtype/region/city/capacity/dates/tags
+- [Calendars & chain bridge](https://zucity.org/api/calendars?format=json): GET, no auth — events, reservations, and the chain-derived registry (real prices, booked days) over REST
+- [Luma events](https://zucity.org/api/luma): GET, no auth — affiliated community events
+- [Site llms.txt](https://zucity.org/llms.txt): who/what ZuCity is, locations, communities, contact
+- [Full listing directory](https://zucity.org/llms-full.txt): every listing with details
+
+## Tools
+
+- [zucity-mcp.js](https://raw.githubusercontent.com/zucity/api-docs/main/zucity-mcp.js): single-file MCP server — 9 tools (search, availability, quotes, ready-to-sign purchase calldata, receipts, forms, referral links). Never holds keys. `node zucity-mcp.js`
+
+## Optional
+
+- [README](https://raw.githubusercontent.com/zucity/api-docs/main/README.md): quickstart, repo map, changelog
+- [Sitemap](https://zucity.org/sitemap.xml): all crawlable pages with language alternates
