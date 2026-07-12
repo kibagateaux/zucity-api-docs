@@ -4,7 +4,7 @@
     "generatedAt": "2026-07-03",
     "sourceState": "zucity-webapp@6eff31e (private repo, main)",
     "verification": "every value below was verified against live zucity.org HTTP responses and live eth_call reads on 2026-07-03; regenerate per release",
-    "docs": "https://github.com/zucity/api-docs"
+    "docs": "https://github.com/kibagateaux/zucity-api-docs"
   },
   "baseUrl": "https://zucity.org",
   "chains": {

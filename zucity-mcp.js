@@ -16,7 +16,7 @@
  *   ZUCITY_RPC_URL   default: public RPC for the selected chain
  *   ZUCITY_REFERRER  optional 0x address used as default onchain referrer
  *
- * Docs: https://github.com/zucity/api-docs (api.md, contracts.md, skills.md, facts.json)
+ * Docs: https://github.com/kibagateaux/zucity-api-docs (api.md, contracts.md, skills.md, facts.json)
  * Generated from zucity-webapp private repo state @ 6eff31e, 2026-07-03.
  */
 
@@ -157,7 +157,7 @@ function ok(payload, source) {
 
 function fail(err) {
   const msg = err instanceof Error ? err.message : String(err);
-  return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: msg, docs: "https://github.com/zucity/api-docs" }) }] };
+  return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: msg, docs: "https://github.com/kibagateaux/zucity-api-docs" }) }] };
 }
 
 async function jfetch(url) {
@@ -449,7 +449,7 @@ server.tool(
           grandTotal: grand,
           buyer,
           decodedEcho: { functionName: decoded.functionName, firstArg: decoded.args?.[0] },
-          docs: "https://github.com/zucity/api-docs/blob/main/contracts.md",
+          docs: "https://github.com/kibagateaux/zucity-api-docs/blob/main/contracts.md",
         },
         { type: "chain", detail: `encoded against ${SYSTEM} @ chain ${CHAIN_ID}; ABI verbatim from source (${GENERATED_FROM})` },
       );

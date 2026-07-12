@@ -18,7 +18,7 @@ curl 'https://zucity.org/api/inventory?itemtype=room&region=nagano&capacity=2'
 Run the MCP server (Node ≥ 20) and wire it into any MCP client:
 
 ```bash
-git clone https://github.com/zucity/api-docs && cd api-docs
+git clone https://github.com/kibagateaux/zucity-api-docs && cd zucity-api-docs
 npm install && npm run smoke     # self-test against live API + chain
 ```
 
