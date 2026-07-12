@@ -24,7 +24,7 @@ Acting for a principal (booking on someone's behalf)? Quote before you promise, 
 
 ## Tools
 
-- [zucity-mcp.js](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/zucity-mcp.js): single-file MCP server — 9 tools (search, availability, quotes, ready-to-sign purchase calldata, receipts, forms, referral links). Never holds keys. `node zucity-mcp.js`
+- [zucity-mcp.js](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/zucity-mcp.js): single-file MCP server — 12 tools (search, availability, quotes, ready-to-sign purchase calldata, receipts, forms, reviews, bundles, referral links). Never holds keys. `node zucity-mcp.js`
 
 ## Optional
 
