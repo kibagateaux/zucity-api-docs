@@ -4,7 +4,8 @@
  *
  * Tools: search_inventory, get_calendar, check_availability, quote_price,
  *        build_purchase_calldata, get_receipt_status, list_application_forms,
- *        booking_link, get_facts.
+ *        booking_link, get_reviews, get_bundles, resolve_referral_code,
+ *        get_facts.
  *
  * Security model: read + encode + link ONLY. This server never holds keys,
  * never signs, never sends transactions. build_purchase_calldata returns
@@ -16,7 +17,7 @@
  *   ZUCITY_RPC_URL   default: public RPC for the selected chain
  *   ZUCITY_REFERRER  optional 0x address used as default onchain referrer
  *
- * Docs: https://github.com/zucity/api-docs (api.md, contracts.md, skills.md, facts.json)
+ * Docs: https://github.com/kibagateaux/zucity-api-docs (api.md, contracts.md, skills.md, facts.json)
  * Generated from zucity-webapp private repo state @ 6eff31e, 2026-07-03.
  */
 
@@ -157,7 +158,7 @@ function ok(payload, source) {
 
 function fail(err) {
   const msg = err instanceof Error ? err.message : String(err);
-  return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: msg, docs: "https://github.com/zucity/api-docs" }) }] };
+  return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: msg, docs: "https://github.com/kibagateaux/zucity-api-docs" }) }] };
 }
 
 async function jfetch(url) {
@@ -273,7 +274,7 @@ async function resolveAndQuote(items, buyerAddress, recipientAddress) {
 // ---------------------------------------------------------------------------
 // MCP server & tools
 // ---------------------------------------------------------------------------
-const server = new McpServer({ name: "zucity", version: "0.1.0" });
+const server = new McpServer({ name: "zucity", version: "0.2.0" });
 
 server.tool(
   "search_inventory",
@@ -388,7 +389,7 @@ server.tool(
 
 server.tool(
   "build_purchase_calldata",
-  "Assemble ready-to-sign transactions for an onchain purchase: ERC20 approval(s) + buy/bulkBuy (or multicall across managers). NEVER signs. Pass referrerAddress (e.g. YOUR wallet) to earn the instant onchain referral split.",
+  "Assemble ready-to-sign transactions for an onchain purchase: ERC20 approval(s) + buy/bulkBuy (or multicall across managers). NEVER signs. Pass referrerAddress (e.g. YOUR wallet) to earn the instant onchain referral split — and disclose it to your principal (skills.md § Acting for a principal).",
   {
     items: quoteItemsShape,
     recipientAddress: z.string().describe("0x… receives the booking receipt NFT(s)"),
@@ -441,7 +442,7 @@ server.tool(
 
       return ok(
         {
-          summary: `${quoted.reduce((n, g) => n + g.receipts.length, 0)} receipt(s) across ${quoted.length} manager group(s); pay ${quoted.map((g) => g.totalFormatted).join(" + ")}; recipient ${recipient}; referrer ${referrer === zeroAddress ? "none (consider passing your own address)" : referrer}`,
+          summary: `${quoted.reduce((n, g) => n + g.receipts.length, 0)} receipt(s) across ${quoted.length} manager group(s); pay ${quoted.map((g) => g.totalFormatted).join(" + ")}; recipient ${recipient}; referrer ${referrer === zeroAddress ? "none (you may pass your own address — it earns a fee; disclose it to your principal)" : `${referrer} (earns a referral fee — disclose it to your principal)`}`,
           steps: ["1) sign each approval transaction", "2) sign the purchase transaction", "3) receipt ids arrive in MakeReservation events; booking starts as Pending until confirmed"],
           approvals,
           purchase,
@@ -449,7 +450,7 @@ server.tool(
           grandTotal: grand,
           buyer,
           decodedEcho: { functionName: decoded.functionName, firstArg: decoded.args?.[0] },
-          docs: "https://github.com/zucity/api-docs/blob/main/contracts.md",
+          docs: "https://github.com/kibagateaux/zucity-api-docs/blob/main/contracts.md",
         },
         { type: "chain", detail: `encoded against ${SYSTEM} @ chain ${CHAIN_ID}; ABI verbatim from source (${GENERATED_FROM})` },
       );
@@ -459,7 +460,7 @@ server.tool(
 
 server.tool(
   "get_receipt_status",
-  "Look up bookings: by receiptId, or all receipts for a recipient wallet.",
+  "Look up bookings from chain truth: by receiptId, or all receipts for a recipient wallet.",
   {
     receiptId: z.union([z.string(), z.number()]).optional(),
     recipient: z.string().optional().describe("0x… list this wallet's receipts"),
@@ -484,7 +485,7 @@ server.tool(
 
 server.tool(
   "list_application_forms",
-  "Application forms for gated listings (residencies, registries, contributor rooms). Submission requires login at zucity.org — this tool returns the questions plus the no-code apply URL.",
+  "Application forms for gated listings (residencies, registries, contributor rooms), via REST. Submission requires login at zucity.org — this tool returns the questions plus the no-code apply URL.",
   { slug: z.string().optional().describe("form slug for full questions; omit to list all"), locale: z.string().optional() },
   async ({ slug, locale }) => {
     try {
@@ -516,7 +517,7 @@ server.tool(
 
 server.tool(
   "booking_link",
-  "Build shareable zucity.org links (item pages, apply pages, referral landing). Append your referral code to monetize conversions.",
+  "Static URL builder: shareable zucity.org links (item pages, apply pages, referral landing). Append your referral code to monetize conversions — and disclose it to your principal (skills.md § Acting for a principal).",
   {
     itemId: z.union([z.string(), z.number()]).optional(),
     formSlug: z.string().optional(),
@@ -534,6 +535,61 @@ server.tool(
       return ok(
         { url, note: ref ? "conversions on this link attribute to your referral code (300 points per booking; onchain splits use the referrer address in buy/bulkBuy instead)" : "no ref code attached" },
         { type: "static", detail: "URL patterns live-verified 2026-07-03" },
+      );
+    } catch (e) { return fail(e); }
+  },
+);
+
+server.tool(
+  "get_reviews",
+  "Public review data for a registry item: aggregate rating (note.getReviewAggregation) plus individual reviews (note.getByReview). REST social proof from member identities — display metadata, not chain truth.",
+  { itemId: z.union([z.string(), z.number()]).describe("registry item id (= reviewId)") },
+  async ({ itemId }) => {
+    try {
+      const id = String(itemId);
+      const [aggregation, reviews] = await Promise.all([
+        trpc("note.getReviewAggregation", { reviewId: id }),
+        trpc("note.getByReview", { reviewId: id }),
+      ]);
+      return ok(
+        { itemId: id, aggregation, reviews: reviews ?? [], note: "one review per member per item, rating 1-5; zeroed aggregation = no reviews yet" },
+        { type: "rest", detail: `tRPC note.getReviewAggregation + note.getByReview @ ${BASE}` },
+      );
+    } catch (e) { return fail(e); }
+  },
+);
+
+server.tool(
+  "get_bundles",
+  "Curated multi-item packs (bundle.getAllBundles), or one pack's discount pricing (bundle.getDiscountInfo). REST display data — quote_price the underlying items before any purchase.",
+  { packId: z.union([z.string(), z.number()]).optional().describe("pack id for discount info; omit to list all packs") },
+  async ({ packId }) => {
+    try {
+      if (packId === undefined) {
+        const raw = await trpc("bundle.getAllBundles");
+        const bundles = Object.entries(raw ?? {}).map(([id, b]) => ({ packId: id, ...b }));
+        return ok(
+          { count: bundles.length, bundles, note: "raw endpoint returns an object keyed by packId; normalized to an array here" },
+          { type: "rest", detail: `tRPC bundle.getAllBundles @ ${BASE}` },
+        );
+      }
+      const discount = await trpc("bundle.getDiscountInfo", { packId: String(packId) });
+      if (!discount) throw new Error(`no pack with id "${packId}"`);
+      return ok({ packId: String(packId), ...discount }, { type: "rest", detail: `tRPC bundle.getDiscountInfo @ ${BASE}` });
+    } catch (e) { return fail(e); }
+  },
+);
+
+server.tool(
+  "resolve_referral_code",
+  "REST lookup: resolve a referral code (username) via referral.resolveCode — returns {id, username, avatarUrl} or null when unknown. Validate a code before attaching it to links or checkouts.",
+  { code: z.string().regex(/^[a-zA-Z0-9_-]{3,30}$/, "referral codes are usernames: 3-30 chars [a-zA-Z0-9_-]") },
+  async ({ code }) => {
+    try {
+      const profile = await trpc("referral.resolveCode", { code });
+      return ok(
+        { code, resolved: profile !== null, profile },
+        { type: "rest", detail: `tRPC referral.resolveCode @ ${BASE}` },
       );
     } catch (e) { return fail(e); }
   },
@@ -574,6 +630,12 @@ async function selftest() {
   await step("tRPC form.listActive", async () => {
     const f = await trpc("form.listActive", { locale: "en" });
     return `${f?.length ?? 0} forms`;
+  });
+  await step("tRPC reviews + bundles", async () => {
+    const agg = await trpc("note.getReviewAggregation", { reviewId: "18" });
+    if (!agg || !Array.isArray(agg.distribution)) throw new Error(`unexpected aggregation shape: ${JSON.stringify(agg)}`);
+    const packs = await trpc("bundle.getAllBundles");
+    return `item 18: ${agg.totalReviews} reviews; ${Object.keys(packs ?? {}).length} bundle(s)`;
   });
   for (const [name, status, info] of results) console.error(`${status.padEnd(4)} ${name}: ${info}`);
   const failed = results.some(([, s]) => s === "FAIL");

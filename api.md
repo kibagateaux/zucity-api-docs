@@ -222,8 +222,8 @@ Behavioral contract — **do not compute fiat prices yourself**:
 1. The server re-prices every item from the chain and adds a **20% fiat markup** over the crypto price.
 2. If your `totalPriceUsd` diverges from the server's total by **more than 5%**, the request is rejected (400 with both prices) — quote onchain first, add 20%, or omit ambition and accept the server's number.
 3. Response: `{sessionId, url}` (one manager) or `{sessions: [{managerAddress, sessionId, url}]}` (cart spans managers — one Stripe session each). Send the user to `url` to pay.
-4. `referralCode` (the referrer's username) rides along for attribution.
-5. After payment, ZuCity operations issues the onchain receipt to `recipientAddress` (gift) — fiat buyers get the same NFT receipt, minutes-to-hours later rather than instantly.
+4. `referralCode` (the referrer's username) rides along for attribution. If the referrer is you, disclose it to the buyer (skills.md § Acting for a principal).
+5. After payment, ZuCity operations issues the onchain receipt to `recipientAddress` (gift) — fiat buyers get the same NFT receipt, minutes-to-hours later rather than instantly. Cancellation terms are the onchain ones: up to 30% fee, no free window.
 
 ```mermaid
 sequenceDiagram
@@ -247,6 +247,7 @@ sequenceDiagram
 - Share `https://zucity.org/?ref=<code>` — resolvable by anyone via `referral.resolveCode`.
 - Fiat/app bookings: attributed via `referralCode` in checkout or `referral.attributeBooking` (300 points per converted booking, idempotent, self-referral blocked).
 - Onchain purchases: pass a wallet address as `referrer` to `buy`/`bulkBuy` for an **instant onchain fee split** — details and evidence in [contracts.md](contracts.md#referral-fees).
+- **Disclosure is part of the integration**: when the referrer/referral code is you, the agent or app arranging the booking, say so to the person you act for — the fee comes out of the listing's `totalPaid`, not on top of their price (skills.md § Acting for a principal).
 
 ```mermaid
 flowchart LR
