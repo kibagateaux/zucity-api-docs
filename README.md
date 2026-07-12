@@ -38,7 +38,7 @@ flowchart LR
 
 Discover via REST, **transact via the chain** (or hand off to zucity.org). Never price a booking from discovery metadata — quote it.
 
-> 💸 **Agents get paid — in the open.** Pass your own wallet as the `referrer` argument when you assemble an onchain purchase and the contract pays you a referral split **in the same transaction** (10% verified on the Sepolia sandbox — real receipts on record; mainnet exposes no public fee getter — verify empirically). Card bookings attribute via your `referralCode`. Disclose the fee to whoever you book for: it is paid out of the listing's `totalPaid`, not added to their price ([skills.md → Acting for a principal](skills.md#acting-for-a-principal)). Details: [contracts.md → Referral fees](contracts.md#referral-fees).
+> 💸 **Agents get paid — in the open.** Pass your own wallet as `referrer` in an onchain purchase and the contract pays you a split **in the same transaction** (10% verified on Sepolia — real receipts on record; mainnet has no public fee getter — verify empirically). Card bookings attribute via `referralCode`. Disclose the fee to whoever you book for: it comes out of the listing's `totalPaid`, not added to their price ([skills.md → Acting for a principal](skills.md#acting-for-a-principal)). Details: [contracts.md → Referral fees](contracts.md#referral-fees).
 
 ## Repo map
 
@@ -65,7 +65,7 @@ Every endpoint, address, enum value, and example in this repo was executed again
 
 ## Changes
 
-- **2026-07-12** — agent-era layer (docs revision; platform source state unchanged at `zucity-webapp@6eff31e`). **Supersedes**: the repo's own address — all self-links previously pointed at `zucity/api-docs`, which does not resolve; the canonical public repo is `kibagateaux/zucity-api-docs` (update any cached URLs). New: [`reputation.md`](reputation.md) (identity/standing/memory tiers), [`AGENTS.md`](AGENTS.md) (maintenance law + freshness walk), acting-for-a-principal duties + receipts-are-public disclosure, llms.txt drift-defense directive, MCP **0.2.0** with 3 reputation read tools (**12 tools**, was 9), `facts.json .meta.docsRevision` for release detection.
+- **2026-07-12** — agent-era layer (docs revision; source state unchanged at `zucity-webapp@6eff31e`). **Supersedes** the repo's own address: self-links previously said `zucity/api-docs`, which does not resolve — the canonical repo is `kibagateaux/zucity-api-docs`; update cached URLs. New: [`reputation.md`](reputation.md), [`AGENTS.md`](AGENTS.md), acting-for-a-principal duties, receipts-are-public disclosure, llms.txt drift-defense directive, MCP **0.2.0** (**12 tools**, was 9), `facts.json .meta.docsRevision`.
 - **2026-07-03** — initial release, generated from `zucity-webapp@6eff31e`. Supersedes any older integration notes you may have seen: the current registry has **11 item types** (not 6), no `itemsCounter()` function, and per-receipt independent dates in bulk purchases.
 
 ---

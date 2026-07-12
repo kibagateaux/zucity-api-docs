@@ -3,7 +3,7 @@
     "name": "zucity-api-docs facts",
     "generatedAt": "2026-07-03",
     "docsRevision": "2026-07-12",
-    "docsRevisionNote": "docs-layer revision (self-links, agent-era layer, MCP 0.2.0); generatedAt unchanged because the platform source state is still zucity-webapp@6eff31e — only the checked surface was re-verified on 2026-07-12",
+    "docsRevisionNote": "docs-layer revision; generatedAt unchanged — source state is still zucity-webapp@6eff31e",
     "sourceState": "zucity-webapp@6eff31e (private repo, main)",
     "verification": "every value below was verified against live zucity.org HTTP responses and live eth_call reads on 2026-07-03; regenerate per release",
     "docs": "https://github.com/kibagateaux/zucity-api-docs"

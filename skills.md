@@ -24,7 +24,7 @@ You are operating against **live production systems with real money** (Ethereum 
 
 ## Acting for a principal
 
-When you book on behalf of a human or organization, these are integration requirements (MUST) — the platform does not enforce them today, but they are what "good agent" means on this network, and restricted accounts do exist (`RecipientBan`):
+Booking for a human or organization? These are integration requirements (MUST) — unenforced today, but they define "good agent" here, and restricted accounts exist (`RecipientBan`):
 
 1. **Quote before you promise** — never state a price you didn't fetch via `getPriceAndDiscountRate` (card: quote × 1.20).
 2. **Confirm dates first** — cancellation costs up to 30%; `Pending` is not yet a confirmed booking.
