@@ -2,7 +2,7 @@
 
 Public integration companion for [zucity.org](https://zucity.org) — a booking platform for curated coliving homes, rooms, venues, event tickets, and memberships across rural Japan (Komoro/Nagano hub + Hokkaido, Kyūshū, Tokyo partners). Bookings settle **onchain** (USDC on Ethereum mainnet; every booking is an ERC-721 receipt NFT) or **by card** (Stripe).
 
-**For AI agents:** start at [`llms.txt`](llms.txt) → [`skills.md`](skills.md). **For developers:** [`api.md`](api.md) + [`contracts.md`](contracts.md).
+**For AI agents:** start at [`llms.txt`](llms.txt) → [`skills.md`](skills.md). **For developers:** [`api.md`](api.md) + [`contracts.md`](contracts.md). **For programs:** [`facts.json`](facts.json) is the machine-readable ground truth. **Editing these docs (human or agent):** the law is [`AGENTS.md`](AGENTS.md).
 
 > 💸 **Agents get paid.** Pass your own wallet as the `referrer` argument when you assemble an onchain purchase and the contract pays you a referral split **in the same transaction** (10% verified on the Sepolia sandbox — real receipts on record). Card bookings attribute via your `referralCode`. Details: [contracts.md → Referral fees](contracts.md#referral-fees).
 
@@ -50,6 +50,7 @@ Discover via REST, **transact via the chain** (or hand off to zucity.org). Never
 | [`contracts.md`](contracts.md) | integrators | addresses, structs, date encoding, purchase chronology, lifecycle, errors |
 | [`facts.json`](facts.json) | machines | ground truth: addresses, enums, limits, verified samples |
 | [`zucity-mcp.js`](zucity-mcp.js) + [`package.json`](package.json) | agent runtimes | single-file MCP server, 9 tools, keyless by design |
+| [`AGENTS.md`](AGENTS.md) | maintainers | the editing law: verify-before-edit, evidence rules, smoke gate, release stamps |
 
 ## Networks
 
