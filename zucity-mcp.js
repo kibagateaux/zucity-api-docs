@@ -442,7 +442,7 @@ server.tool(
 
       return ok(
         {
-          summary: `${quoted.reduce((n, g) => n + g.receipts.length, 0)} receipt(s) across ${quoted.length} manager group(s); pay ${quoted.map((g) => g.totalFormatted).join(" + ")}; recipient ${recipient}; referrer ${referrer === zeroAddress ? "none (consider passing your own address)" : referrer}`,
+          summary: `${quoted.reduce((n, g) => n + g.receipts.length, 0)} receipt(s) across ${quoted.length} manager group(s); pay ${quoted.map((g) => g.totalFormatted).join(" + ")}; recipient ${recipient}; referrer ${referrer === zeroAddress ? "none (you may pass your own address — it earns a fee; disclose it to your principal)" : `${referrer} (earns a referral fee — disclose it to your principal)`}`,
           steps: ["1) sign each approval transaction", "2) sign the purchase transaction", "3) receipt ids arrive in MakeReservation events; booking starts as Pending until confirmed"],
           approvals,
           purchase,

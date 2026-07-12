@@ -223,7 +223,7 @@ Behavioral contract — **do not compute fiat prices yourself**:
 2. If your `totalPriceUsd` diverges from the server's total by **more than 5%**, the request is rejected (400 with both prices) — quote onchain first, add 20%, or omit ambition and accept the server's number.
 3. Response: `{sessionId, url}` (one manager) or `{sessions: [{managerAddress, sessionId, url}]}` (cart spans managers — one Stripe session each). Send the user to `url` to pay.
 4. `referralCode` (the referrer's username) rides along for attribution. If the referrer is you, disclose it to the buyer (skills.md § Acting for a principal).
-5. After payment, ZuCity operations issues the onchain receipt to `recipientAddress` (gift) — fiat buyers get the same NFT receipt, minutes-to-hours later rather than instantly.
+5. After payment, ZuCity operations issues the onchain receipt to `recipientAddress` (gift) — fiat buyers get the same NFT receipt, minutes-to-hours later rather than instantly. Cancellation terms are the onchain ones: up to 30% fee, no free window.
 
 ```mermaid
 sequenceDiagram

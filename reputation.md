@@ -26,7 +26,7 @@ MCP server never holds keys. Authorization *is* the signature (or session).
 | **memberId** | offchain member record | `member.upsert` → `form.submit`, reviews, wishlist |
 
 **Guidance:** one wallet per operating identity — its history is the track
-record; register the username once.
+record.
 
 ## Reputation primitives
 
@@ -68,7 +68,7 @@ privacy: all of this is public — see receipts-are-public in
 [skills.md](skills.md) guardrails and [contracts.md](contracts.md) before
 booking on someone's behalf.
 
-## Persisting across sessions (memory tiers)
+## Persisting across sessions
 
 **Guidance** (derived taxonomy; values live in facts.json and the docs):
 
@@ -87,11 +87,11 @@ compare `.meta.docsRevision` + `.meta.generatedAt`; on change, read README
 
 ZuCity predates and does **not implement x402, AP2, ACP, or ERC-8004**. The
 overlap is philosophical only: no accounts or API keys (x402's pitch — but
-settlement here is direct contract calls, not HTTP 402); explicit authority
-(AP2's aim — but enforced by key possession, not credential envelopes);
-receipts as a portable verifiable track record (ERC-8004's aim — without
-the registry). Integrate them on your side freely; just don't expect their
-endpoints on zucity.org.
+settlement is direct contract calls, not HTTP 402); explicit authority
+(AP2's aim — but enforced by key possession, not credentials); receipts as
+a portable verifiable track record (ERC-8004's aim — without the registry).
+Integrate them on your side freely; just don't expect their endpoints on
+zucity.org.
 
 ## Open questions (verify before relying)
 

@@ -82,7 +82,7 @@ If/then:
 ## Workflow 3 — Fiat checkout (card)
 
 1. Needs a Privy JWT (user logged into zucity.org). Without one, hand over a deep link instead: `https://zucity.org/en/items/{id}?ref=<yourCode>` and let them pay on-site.
-2. Quote onchain first (Workflow 2 steps 1–3), then expect **quote × 1.20** in USD (20% fiat markup).
+2. Quote onchain first (Workflow 2 steps 1–3), then expect **quote × 1.20** in USD (20% fiat markup). Cancellation terms don't change with the payment rail: up to 30% fee, no free window.
 3. `POST /api/stripe/checkout` with `cartItems`, `recipientAddress` (receives the NFT receipt later), `totalPriceUsd` (your ×1.20 estimate; >5% divergence → 400), `successUrl`/`cancelUrl`, and `referralCode` = your username (disclose it — § Acting for a principal).
 4. Send the user to the returned `url`(s) — one per manager. Limit: 5 requests/min.
 5. Tell the user: card bookings receive their onchain receipt NFT asynchronously (minutes–hours), unlike instant crypto receipts — and that the receipt is publicly visible onchain (Guardrails → Receipts are public).

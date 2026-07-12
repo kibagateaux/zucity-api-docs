@@ -28,13 +28,12 @@ repo is worthless.
    on this repo's public surface does not ship.
 4. **Smoke gate.** `npm install && npm run smoke` must exit 0 on mainnet AND
    with `ZUCITY_CHAIN_ID=11155111` before any PR. A tool count/name/version
-   change updates README.md, llms.txt, the zucity-mcp.js header, and
-   package.json in the same commit — one count, everywhere.
+   change updates README, llms.txt, the mcp header, and package.json in the
+   same commit — one count, everywhere.
 5. **Release stamps.** `facts.json → .meta.generatedAt` changes ONLY on
    regeneration from a new platform release. Docs-layer edits bump
    `.meta.docsRevision` and add a dated README `## Changes` entry — with a
-   supersedes note when correcting older guidance, so caches know what to
-   evict.
+   supersedes note when correcting older guidance.
 
 ## Freshness walk (returning agents, CI)
 
