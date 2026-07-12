@@ -389,7 +389,7 @@ server.tool(
 
 server.tool(
   "build_purchase_calldata",
-  "Assemble ready-to-sign transactions for an onchain purchase: ERC20 approval(s) + buy/bulkBuy (or multicall across managers). NEVER signs. Pass referrerAddress (e.g. YOUR wallet) to earn the instant onchain referral split.",
+  "Assemble ready-to-sign transactions for an onchain purchase: ERC20 approval(s) + buy/bulkBuy (or multicall across managers). NEVER signs. Pass referrerAddress (e.g. YOUR wallet) to earn the instant onchain referral split — and disclose it to your principal (skills.md § Acting for a principal).",
   {
     items: quoteItemsShape,
     recipientAddress: z.string().describe("0x… receives the booking receipt NFT(s)"),
