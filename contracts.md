@@ -176,6 +176,7 @@ stateDiagram-v2
 ```
 
 - Receipts are **ERC-721 NFTs** ("ZuCity Japan Network", ZUJP): once Accepted, `ownerOf(receiptId)` is the guest; the booking is provable and (where `transferable`) transferable.
+- **Receipts are public.** Like all onchain state, a receipt exposes its recipient wallet, listing, dates, and amount to anyone (and `/api/calendars/{wallet}` serves any wallet's bookings over REST). Integrators buying on a user's behalf should say so and choose the `recipient` address deliberately — a dedicated wallet decouples stays from a primary identity. There is no private-booking mode today.
 - Buyers who pass the manager's ReceiptValidator are confirmed automatically in the same transaction; otherwise the receipt stays `Pending` until the manager confirms.
 - **Cancellation costs up to `cancelFeeBps()` — currently `3000` (30%) on both chains.** The refund returns to the recipient in the payment token. There is no fee-free cancellation window onchain; confirm plans before buying.
 - Track your bookings: `receipts(id)`, `allReceipts(0, [0xFFFFFFFFFFFFFFFF], yourAddress, 255)` (max-sentinel filters mean "all items / all statuses"), or over REST via `/api/calendars/{yourAddress}?format=json`.
@@ -187,6 +188,7 @@ stateDiagram-v2
 - **Verified on Sepolia**: `referrerFeeBPS() = 1000` (10%), and live receipts 0 and 2 each record exactly 10% of `totalPaid` as `referrerFee`.
 - The mainnet deployment does not expose a public fee getter — verify the current mainnet split empirically (read `receipts(id).referrerFee` after a small purchase) rather than assuming a number.
 - This is the agent monetization hook: pass **your own wallet** as `referrer` when assembling purchases for users. No registration required.
+- **Disclose the fee to whoever you buy for.** It is paid out of `totalPaid` — `getPriceAndDiscountRate` takes no referrer argument, so the referrer split does not change the buyer's quote. Undisclosed referral interest is against integration requirements (skills.md § Acting for a principal).
 
 ## Events (for indexing)
 

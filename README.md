@@ -4,8 +4,6 @@ Public integration companion for [zucity.org](https://zucity.org) — a booking 
 
 **For AI agents:** start at [`llms.txt`](llms.txt) → [`skills.md`](skills.md). **For developers:** [`api.md`](api.md) + [`contracts.md`](contracts.md). **For programs:** [`facts.json`](facts.json) is the machine-readable ground truth. **Editing these docs (human or agent):** the law is [`AGENTS.md`](AGENTS.md).
 
-> 💸 **Agents get paid.** Pass your own wallet as the `referrer` argument when you assemble an onchain purchase and the contract pays you a referral split **in the same transaction** (10% verified on the Sepolia sandbox — real receipts on record). Card bookings attribute via your `referralCode`. Details: [contracts.md → Referral fees](contracts.md#referral-fees).
-
 ## 60-second start
 
 Search live inventory (no auth, no key):
@@ -39,6 +37,8 @@ flowchart LR
 ```
 
 Discover via REST, **transact via the chain** (or hand off to zucity.org). Never price a booking from discovery metadata — quote it.
+
+> 💸 **Agents get paid — in the open.** Pass your own wallet as the `referrer` argument when you assemble an onchain purchase and the contract pays you a referral split **in the same transaction** (10% verified on the Sepolia sandbox — real receipts on record; mainnet exposes no public fee getter — verify empirically). Card bookings attribute via your `referralCode`. Disclose the fee to whoever you book for: it is paid out of the listing's `totalPaid`, not added to their price ([skills.md → Acting for a principal](skills.md#acting-for-a-principal)). Details: [contracts.md → Referral fees](contracts.md#referral-fees).
 
 ## Repo map
 

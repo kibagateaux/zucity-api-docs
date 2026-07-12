@@ -22,6 +22,16 @@ You are operating against **live production systems with real money** (Ethereum 
 5. `price: 0` or `externalPurchaseLink` set ⇒ application-gated ⇒ apply flow, not purchase.
 6. Dates encode as `(year = calendarYear − 2023, startDay = 1-indexed day-of-year, daysCount = inclusive days)`.
 
+## Acting for a principal
+
+When you book on behalf of a human or organization, these are integration requirements (MUST) — the platform does not enforce them today, but they are what "good agent" means on this network, and restricted accounts do exist (`RecipientBan`):
+
+1. **Quote before you promise** — never state a price you didn't fetch via `getPriceAndDiscountRate` (card: quote × 1.20).
+2. **Confirm dates first** — cancellation costs up to 30%; `Pending` is not yet a confirmed booking.
+3. **Disclose your referral interest.** If you set your wallet as `referrer` or attach your `referralCode`, say so. The fee comes out of the listing's `totalPaid` — the quote function takes no referrer argument, so your fee does not change the buyer's price (10% verified on Sepolia; mainnet: verify empirically).
+4. **Tell them what's public** — receipts are onchain (see Guardrails → Receipts are public).
+5. **You never hold their keys.** You assemble; they sign.
+
 ## Decision tree
 
 ```mermaid
@@ -60,8 +70,8 @@ Strict order — each step depends on the previous:
    - one item → `buy(receipt, referrer)`
    - several items, one manager → `bulkBuy(receipts, referrer)` (same token required; independent dates fine)
    - several managers → `multicall([encoded buy/bulkBuy per manager])`
-   Pass **your own wallet** as `referrer` to earn the instant onchain referral split (see Workflow 5).
-6. **Confirm outcome**: read `receiptId`s from `MakeReservation` events; report status (`Pending` = paid, awaiting host confirmation; `Accepted` = confirmed NFT booking).
+   Pass **your own wallet** as `referrer` to earn the instant onchain referral split (see Workflow 5) — and disclose that fee to the person you book for; it is paid out of the listing's `totalPaid`, not added to their price (§ Acting for a principal).
+6. **Confirm outcome**: read `receiptId`s from `MakeReservation` events; report status (`Pending` = paid, awaiting host confirmation; `Accepted` = confirmed NFT booking). The receipt is a public onchain record (Guardrails → Receipts are public).
 
 If/then:
 - Stay crosses Dec 31 → still one receipt; encoding wraps years (contracts.md).
@@ -73,9 +83,9 @@ If/then:
 
 1. Needs a Privy JWT (user logged into zucity.org). Without one, hand over a deep link instead: `https://zucity.org/en/items/{id}?ref=<yourCode>` and let them pay on-site.
 2. Quote onchain first (Workflow 2 steps 1–3), then expect **quote × 1.20** in USD (20% fiat markup).
-3. `POST /api/stripe/checkout` with `cartItems`, `recipientAddress` (receives the NFT receipt later), `totalPriceUsd` (your ×1.20 estimate; >5% divergence → 400), `successUrl`/`cancelUrl`, and `referralCode` = your username.
+3. `POST /api/stripe/checkout` with `cartItems`, `recipientAddress` (receives the NFT receipt later), `totalPriceUsd` (your ×1.20 estimate; >5% divergence → 400), `successUrl`/`cancelUrl`, and `referralCode` = your username (disclose it — § Acting for a principal).
 4. Send the user to the returned `url`(s) — one per manager. Limit: 5 requests/min.
-5. Tell the user: card bookings receive their onchain receipt NFT asynchronously (minutes–hours), unlike instant crypto receipts.
+5. Tell the user: card bookings receive their onchain receipt NFT asynchronously (minutes–hours), unlike instant crypto receipts — and that the receipt is publicly visible onchain (Guardrails → Receipts are public).
 
 ## Workflow 4 — Applications (gated listings, residencies, registries)
 
@@ -87,14 +97,15 @@ If/then:
 ## Workflow 5 — Referrals (monetize your recommendations)
 
 Two independent rails — use both:
-1. **Onchain, instant**: pass your wallet as `referrer` in every `buy`/`bulkBuy` you assemble. The contract pays your split in the same transaction (verified 10% on Sepolia receipts; mainnet split not publicly readable — verify once empirically, see contracts.md).
-2. **Code-based**: register a username (`member.setMyUsername`, `^[a-zA-Z0-9_-]{3,30}$`, needs JWT), then append `?ref=<username>` to every zucity.org link you share and set `referralCode` in fiat checkouts. Converted bookings earn 300 points (`referral.attributeBooking`; idempotent; self-referral blocked). Track with `referral.getMyStats`.
+1. **Onchain, instant**: pass your wallet as `referrer` in every `buy`/`bulkBuy` you assemble. The contract pays your split in the same transaction (verified 10% on Sepolia receipts; mainnet split not publicly readable — verify once empirically, see contracts.md). Disclose this fee to your principal — it comes out of the listing's `totalPaid`, not on top of their price (§ Acting for a principal).
+2. **Code-based**: register a username (`member.setMyUsername`, `^[a-zA-Z0-9_-]{3,30}$`, needs JWT), then append `?ref=<username>` to every zucity.org link you share and set `referralCode` in fiat checkouts. Converted bookings earn 300 points (`referral.attributeBooking`; idempotent; self-referral blocked). Track with `referral.getMyStats`. Same disclosure duty as rail 1 (§ Acting for a principal).
 
 ## Guardrails & failure modes
 
 - **Price honesty**: quote before quoting the user. API `price` drifted from chain price on live items at verification time (15 vs 10 USDC). Fiat = quote × 1.20.
 - **Chain check**: before any signature, verify `chainId` (1 = real funds; 11155111 = sandbox) and that `to` = the ZuCitySystem address from [facts.json](facts.json).
 - **Pending ≠ confirmed**: after `buy`, status may be `Pending` until the host confirms. Say so.
+- **Receipts are public**: every booking mints an ERC-721 receipt on a public chain — recipient wallet, listing, dates, and amount are readable by anyone, and `/api/calendars/{wallet}` serves any wallet's bookings over REST. Before buying for someone, say so, and choose the `recipient` address deliberately: a dedicated wallet decouples their stays from their main identity (applies to card checkout too, via `recipientAddress`). There is no private-booking mode today.
 - **Cancellation**: up to 30% fee, no free window. Confirm dates before buying.
 - **429**: honor `Retry-After`. Budgets: 30 reads / 10 mutations / 5 checkouts per minute.
 - **Sentinel items**: never build calldata for `minUnitPrice = 2^128−2`; reroute to the apply flow (this converts better than a revert).
