@@ -111,7 +111,9 @@
     "referralLanding": "https://zucity.org/?ref={code}",
     "llms": "https://zucity.org/llms.txt",
     "llmsFull": "https://zucity.org/llms-full.txt",
-    "sitemap": "https://zucity.org/sitemap.xml"
+    "sitemap": "https://zucity.org/sitemap.xml",
+    "reputationDoc": "https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/reputation.md",
+    "agentsFile": "https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md"
   },
   "liveVerifiedSamples": {
     "inventoryCount": 142,

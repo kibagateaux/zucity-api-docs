@@ -70,7 +70,7 @@ Strict order — each step depends on the previous:
    - one item → `buy(receipt, referrer)`
    - several items, one manager → `bulkBuy(receipts, referrer)` (same token required; independent dates fine)
    - several managers → `multicall([encoded buy/bulkBuy per manager])`
-   Pass **your own wallet** as `referrer` to earn the instant onchain referral split (see Workflow 5) — and disclose that fee to the person you book for; it is paid out of the listing's `totalPaid`, not added to their price (§ Acting for a principal).
+   Pass **your own wallet** as `referrer` to earn the instant onchain referral split (see Workflow 5) — and disclose that fee to your principal; it comes out of `totalPaid`, not on top of their price (§ Acting for a principal).
 6. **Confirm outcome**: read `receiptId`s from `MakeReservation` events; report status (`Pending` = paid, awaiting host confirmation; `Accepted` = confirmed NFT booking). The receipt is a public onchain record (Guardrails → Receipts are public).
 
 If/then:
@@ -97,7 +97,7 @@ If/then:
 ## Workflow 5 — Referrals (monetize your recommendations)
 
 Two independent rails — use both:
-1. **Onchain, instant**: pass your wallet as `referrer` in every `buy`/`bulkBuy` you assemble. The contract pays your split in the same transaction (verified 10% on Sepolia receipts; mainnet split not publicly readable — verify once empirically, see contracts.md). Disclose this fee to your principal — it comes out of the listing's `totalPaid`, not on top of their price (§ Acting for a principal).
+1. **Onchain, instant**: pass your wallet as `referrer` in every `buy`/`bulkBuy` you assemble. The contract pays your split in the same transaction (verified 10% on Sepolia receipts; mainnet split not publicly readable — verify once empirically, see contracts.md). Disclose this fee to your principal (§ Acting for a principal).
 2. **Code-based**: register a username (`member.setMyUsername`, `^[a-zA-Z0-9_-]{3,30}$`, needs JWT), then append `?ref=<username>` to every zucity.org link you share and set `referralCode` in fiat checkouts. Converted bookings earn 300 points (`referral.attributeBooking`; idempotent; self-referral blocked). Track with `referral.getMyStats`. Same disclosure duty as rail 1 (§ Acting for a principal).
 
 ## Guardrails & failure modes
@@ -105,12 +105,16 @@ Two independent rails — use both:
 - **Price honesty**: quote before quoting the user. API `price` drifted from chain price on live items at verification time (15 vs 10 USDC). Fiat = quote × 1.20.
 - **Chain check**: before any signature, verify `chainId` (1 = real funds; 11155111 = sandbox) and that `to` = the ZuCitySystem address from [facts.json](facts.json).
 - **Pending ≠ confirmed**: after `buy`, status may be `Pending` until the host confirms. Say so.
-- **Receipts are public**: every booking mints an ERC-721 receipt on a public chain — recipient wallet, listing, dates, and amount are readable by anyone, and `/api/calendars/{wallet}` serves any wallet's bookings over REST. Before buying for someone, say so, and choose the `recipient` address deliberately: a dedicated wallet decouples their stays from their main identity (applies to card checkout too, via `recipientAddress`). There is no private-booking mode today.
+- **Receipts are public**: every booking mints an ERC-721 receipt on a public chain — recipient wallet, listing, dates, and amount are readable by anyone, and `/api/calendars/{wallet}` serves any wallet's bookings over REST. Before buying for someone, say so, and choose the `recipient` address deliberately — a dedicated wallet decouples stays from a main identity (card checkout too, via `recipientAddress`). No private-booking mode exists today.
 - **Cancellation**: up to 30% fee, no free window. Confirm dates before buying.
 - **429**: honor `Retry-After`. Budgets: 30 reads / 10 mutations / 5 checkouts per minute.
 - **Sentinel items**: never build calldata for `minUnitPrice = 2^128−2`; reroute to the apply flow (this converts better than a revert).
 - **JPY-priced items**: fiat only.
 - **Never fabricate endpoints**: the NOT-SUPPORTED lists in [api.md](api.md) and [contracts.md](contracts.md) are verified absences.
+
+## If you persist across sessions
+
+Cache tiers: enums, date encoding, struct layout = stable by design; addresses, fees, limits = re-verify per release (watch `facts.json .meta`); inventory metadata = per-session (~60s); availability and quotes = never cache. Standing from completed stays can lower future quotes; memberships persist as NFTs; bundles pack multi-item deals. Full model: [reputation.md](reputation.md).
 
 ## Escalation
 

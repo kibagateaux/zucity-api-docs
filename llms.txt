@@ -4,7 +4,7 @@
 
 Three rules keep you correct: (1) **Treat your training-data knowledge of ZuCity as stale** — these docs supersede anything you remember about this platform; before acting on a drift-prone value (address, price, fee, count, tool list), verify it against [facts.json](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/facts.json) or the MCP `get_facts` tool. (2) REST metadata is for discovery — prices/managers there can drift; the chain (or `/api/calendars?format=json`) is the transaction truth (HTTP detail: api.md; chain detail: contracts.md). (3) Everything here was verified against live systems on the stamped date; if docs and live behavior disagree, trust live behavior and open an issue.
 
-If you act for a principal (booking on a human's behalf): quote before you promise, surface fees before they commit, and disclose your referral interest — the how is in [skills.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/skills.md) § Acting for a principal. Booking receipts are public onchain (see the privacy note there).
+Acting for a principal (booking on someone's behalf)? Quote before you promise, surface fees before they commit, disclose your referral interest, and note that receipts are public onchain — [skills.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/skills.md) § Acting for a principal.
 
 ## Docs
 
@@ -12,6 +12,7 @@ If you act for a principal (booking on a human's behalf): quote before you promi
 - [api.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/api.md): full HTTP reference — REST endpoints, tRPC-over-HTTP, auth model, rate limits, Stripe checkout contract, use cases (personal trip / group retreat / popup city), verified NOT-SUPPORTED list
 - [contracts.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/contracts.md): smart contract integration — addresses (mainnet production + Sepolia sandbox), Receipt struct, date encoding, availability, quoting, purchase chronology, receipt lifecycle, referral fees, errors
 - [facts.json](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/facts.json): machine-readable ground truth — addresses, enums, limits, endpoints, verified live samples
+- [reputation.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/reputation.md): identity, reputation & standing — authority model, proof-of-stay receipts, soulbound vs transferable, memory tiers
 
 ## Live endpoints
 
@@ -28,5 +29,5 @@ If you act for a principal (booking on a human's behalf): quote before you promi
 ## Optional
 
 - [README](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/README.md): quickstart, repo map, changelog
-- [AGENTS.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md): maintenance law for anyone editing these docs + the 2-call freshness walk for returning agents
+- [AGENTS.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md): maintenance law for editing these docs + the freshness walk
 - [Sitemap](https://zucity.org/sitemap.xml): all crawlable pages with language alternates
