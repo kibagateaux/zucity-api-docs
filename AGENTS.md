@@ -4,6 +4,9 @@
 - AI agents → [llms.txt](llms.txt) then [skills.md](skills.md)
 - Human developers → [api.md](api.md) + [contracts.md](contracts.md)
 - Programs / machine consumers → [facts.json](facts.json)
+- Harness bootstrap → [CLAUDE.md](CLAUDE.md) / [AGENT.md](AGENT.md)
+  (identical) · [SKILL.md](SKILL.md) (installable) · [MEMORY.md](MEMORY.md)
+  (persistence seed)
 
 **This file is the law for agents and humans *editing these docs*.** The
 repo's value is one property: everything here was executed against live
@@ -34,6 +37,13 @@ repo is worthless.
    regeneration from a new platform release. Docs-layer edits bump
    `.meta.docsRevision` and add a dated README `## Changes` entry — with a
    supersedes note when correcting older guidance.
+6. **Entry files stay routers.** CLAUDE.md and AGENT.md are
+   content-identical apart from the H1; SKILL.md's frontmatter
+   `name`/`description` stay byte-identical to skills.md's; CLAUDE.md,
+   AGENT.md, SKILL.md, and MEMORY.md carry pointers only — never volatile
+   values or workflow content of their own — and are subject to every rule
+   above. Mechanical check before any PR touching them:
+   `npm run check-docs` (mirror, identity, byte ceilings, llms.txt cap).
 
 ## Freshness walk (returning agents, CI)
 

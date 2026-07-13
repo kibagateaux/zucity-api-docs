@@ -2,7 +2,7 @@
   "meta": {
     "name": "zucity-api-docs facts",
     "generatedAt": "2026-07-03",
-    "docsRevision": "2026-07-12",
+    "docsRevision": "2026-07-13",
     "docsRevisionNote": "docs-layer revision; generatedAt unchanged — source state is still zucity-webapp@6eff31e",
     "sourceState": "zucity-webapp@6eff31e (private repo, main)",
     "verification": "every value below was verified against live zucity.org HTTP responses and live eth_call reads on 2026-07-03; regenerate per release",
@@ -115,7 +115,8 @@
     "llmsFull": "https://zucity.org/llms-full.txt",
     "sitemap": "https://zucity.org/sitemap.xml",
     "reputationDoc": "https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/reputation.md",
-    "agentsFile": "https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md"
+    "agentsFile": "https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md",
+    "integrationsDoc": "https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/integrations.md"
   },
   "liveVerifiedSamples": {
     "inventoryCount": 142,

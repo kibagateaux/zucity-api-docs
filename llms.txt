@@ -13,14 +13,15 @@ Acting for a principal? Quote before you promise, surface fees before they commi
 - [contracts.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/contracts.md): smart contract integration — addresses (mainnet production + Sepolia sandbox), Receipt struct, date encoding, availability, quoting, purchase chronology, receipt lifecycle, referral fees, errors
 - [facts.json](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/facts.json): machine-readable ground truth — addresses, enums, limits, endpoints, verified live samples
 - [reputation.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/reputation.md): identity, reputation & standing — authority model, proof-of-stay receipts, soulbound vs transferable, memory tiers
+- [integrations.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/integrations.md): Google Calendar subscribe, Luma event propagation, group-chat agents
 
 ## Live endpoints
 
-- [Inventory search](https://zucity.org/api/inventory): GET, no auth — 142 curated items, filterable by itemtype/region/city/capacity/dates/tags
-- [Calendars & chain bridge](https://zucity.org/api/calendars?format=json): GET, no auth — events, reservations, and the chain-derived registry (real prices, booked days) over REST
+- [Inventory search](https://zucity.org/api/inventory): GET, no auth — curated registry, filterable by itemtype/region/city/capacity/dates/tags
+- [Calendars & chain bridge](https://zucity.org/api/calendars?format=json): GET, no auth — events, reservations, chain-derived registry (real prices, booked days) over REST
 - [Luma events](https://zucity.org/api/luma): GET, no auth — affiliated community events
 - [Site llms.txt](https://zucity.org/llms.txt): who/what ZuCity is, locations, communities, contact
-- [Full listing directory](https://zucity.org/llms-full.txt): every listing with details
+- [Listing directory](https://zucity.org/llms-full.txt): every listing, details
 
 ## Tools
 
@@ -29,5 +30,5 @@ Acting for a principal? Quote before you promise, surface fees before they commi
 ## Optional
 
 - [README](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/README.md): quickstart, repo map, changelog
-- [AGENTS.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md): maintenance law for editing these docs + the freshness walk
-- [Sitemap](https://zucity.org/sitemap.xml): all crawlable pages with language alternates
+- [AGENTS.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md): maintenance law + the freshness walk
+- [Sitemap](https://zucity.org/sitemap.xml): crawlable pages + language alternates

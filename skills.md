@@ -51,7 +51,7 @@ flowchart TD
 ## Workflow 1 — Search & recommend
 
 1. `GET https://zucity.org/api/inventory?<filters>` — filters: `itemtype` (`room|suite|villa|venue|ticket|membership|art|merch|equipment` or `0–10`; `sponsorship`→`2`, `service`→`5` numeric only), `region`, `city`, `capacity`, `startdate/enddate` (`YYYY-MM-DD` strict), `tags`, `community`, `paytoken`, `host`. AND-combined.
-2. Colivings = `room`/`suite`/`villa`. Events = `ticket` + `GET /api/luma`. Communities: filter `community=zucity|elelfa|address|midori`.
+2. Colivings = `room`/`suite`/`villa`. Events = `ticket` + `GET /api/luma`. Communities: filter `community=zucity|elelfa|address|midori`. Calendar-subscribe + event-propagation workflows: [integrations.md](integrations.md).
 3. Present `displayName`, city, `sleeps`/`maxOccupancy`, check-in/out, tags. Treat API `price` as *indicative only* — say "from ~X, exact quote next".
 4. If `externalPurchaseLink` is set → route to Workflow 4.
 5. Rate limit: 30 reads/min/IP. Cache responses ~60s.
@@ -114,7 +114,7 @@ Two independent rails — use both:
 
 ## If you persist across sessions
 
-Cache tiers: enums, date encoding, struct layout = stable by design; addresses, fees, limits = re-verify per release (watch `facts.json .meta`); inventory metadata = per-session (~60s); availability and quotes = never cache. Standing from completed stays can lower future quotes; memberships persist as NFTs; bundles pack multi-item deals. Full model: [reputation.md](reputation.md).
+Cache tiers: enums, date encoding, struct layout = stable by design; addresses, fees, limits = re-verify per release (watch `facts.json .meta`); inventory metadata = per-session (~60s); availability and quotes = never cache. Standing from completed stays can lower future quotes; memberships persist as NFTs; bundles pack multi-item deals. Full model: [reputation.md](reputation.md). Persistence seed: [MEMORY.md](MEMORY.md).
 
 ## Escalation
 
