@@ -25,9 +25,10 @@ https://zucity.org/api/calendars?format=google
 
 It answers `302` to Google Calendar's add-by-URL screen
 (`https://calendar.google.com/calendar/render?cid=webcal%3A%2F%2Fzucity.org%2Fapi%2Fcalendars`);
-confirm there and the ZuCity calendar appears in your list. Filters carry
-into the subscription — e.g. `?communityName=zucity&format=google` redirects
-with the scoped feed embedded in `cid` (Verified).
+what happens after you confirm is Google's own add-calendar flow (external
+product). Filters carry into the subscription — Verified for community
+scoping: `?communityName=zucity&format=google` redirects with the scoped
+feed embedded in `cid`.
 
 **Apple Calendar / clients that speak webcal** (Verified):
 `?format=ical` answers `302 webcal://zucity.org/api/calendars`.

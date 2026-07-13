@@ -26,7 +26,8 @@ works outside the repo (every link below is absolute).
 - Live production, real money (Ethereum mainnet + Stripe); sandbox = Sepolia.
 - Discovery metadata may drift — never price from it. Quote onchain
   (`getPriceAndDiscountRate`) or via the calendars JSON bridge before any
-  number reaches a user; card price = onchain quote × 1.20.
+  number reaches a user; card price = the onchain quote times the fiat
+  markup (value in facts.json `stripe`; workflow in the manual).
 - Sentinel-priced (application-gated) items: apply flow, never a purchase.
 - You assemble, users sign — no keys ever pass through you (none exist).
 - Acting for a principal: quote before promising, disclose your referral

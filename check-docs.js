@@ -38,9 +38,12 @@ check("llms.txt: drift directive in first 10 lines", llms.slice(0, 10).some((l) 
 // 5 · SKILL.md links are absolute (survives copy-out installation)
 check("SKILL.md: no relative links", !/\]\((?:\.\/|[\w.-]+\.(?:md|json|js))[)#]/.test(read("SKILL.md")));
 
-// 6 · Entry files carry no volatile values (addresses; onchain hex)
+// 6 · Entry files carry no volatile values: addresses, percents,
+//     price multipliers, or counts of drift-prone things (AGENTS.md rule 6)
+const volatile = /0x[a-fA-F0-9]{6,}|\d+(?:\.\d+)?\s*%|[×x*]\s*\d+\.\d+|\b\d+\s+(?:tools|calendars|events|items|workflows|listings)\b/;
 for (const f of ["CLAUDE.md", "AGENT.md", "SKILL.md", "MEMORY.md"]) {
-  check(`no-volatile: ${f} has no 0x… addresses`, !/0x[a-fA-F0-9]{6,}/.test(read(f)));
+  const m = read(f).match(volatile);
+  check(`no-volatile: ${f}`, !m, m ? `matched "${m[0]}"` : "");
 }
 
 process.exit(failed ? 1 : 0);
