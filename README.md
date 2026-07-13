@@ -52,6 +52,10 @@ Discover via REST, **transact via the chain** (or hand off to zucity.org). Never
 | [`facts.json`](facts.json) | machines | ground truth: addresses, enums, limits, verified samples |
 | [`zucity-mcp.js`](zucity-mcp.js) + [`package.json`](package.json) | agent runtimes | single-file MCP server, 12 tools, keyless by design |
 | [`AGENTS.md`](AGENTS.md) | maintainers | the editing law: verify-before-edit, evidence rules, smoke gate, release stamps |
+| [`CLAUDE.md`](CLAUDE.md) | harness bootstrap | Claude Code orientation — router into llms.txt → skills.md → facts.json |
+| [`AGENT.md`](AGENT.md) | harness bootstrap | identical twin of CLAUDE.md for AGENT.md-reading harnesses |
+| [`SKILL.md`](SKILL.md) | harness bootstrap | installable skill wrapper for [`skills.md`](skills.md) — absolute links, works copied out of the repo |
+| [`MEMORY.md`](MEMORY.md) | harness bootstrap | persistence seed: wake procedure, cache tiers, safety policies |
 
 ## Networks
 
