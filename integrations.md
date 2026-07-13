@@ -113,13 +113,8 @@ llms.txt):
   ours until zucity.org or this repo says so — check both before trusting
   one.
 
-**What works today — bring your own agent** (Verified components): run this
-repo's keyless MCP server in your own agent runtime and add *your* agent to
-*your* group ([README quickstart](README.md), [skills.md](skills.md)). It
-searches, quotes, and assembles ready-to-sign calldata and checkout links;
-each member signs and pays for themselves.
-
-**Before adding any agent to a group** (integration guidance, MUST):
+**Before adding any agent to a group — yours or anyone's** (integration
+guidance, MUST — read before the mechanics below):
 
 1. **Consent first.** An admin adding a bot is not member consent — tell the
    group what the agent reads and let people object before it joins.
@@ -130,6 +125,12 @@ each member signs and pays for themselves.
    Choose the `recipient` deliberately.
 3. **Never paste keys in chat.** The agent assembles; each buyer signs their
    own transaction. Nothing here ever needs a private key in a message.
+
+**What works today — bring your own agent** (Verified components): run this
+repo's keyless MCP server in your own agent runtime and add *your* agent to
+*your* group ([README quickstart](README.md), [skills.md](skills.md)). It
+searches, quotes, and assembles ready-to-sign calldata and checkout links;
+each member signs and pays for themselves.
 
 **Want a ZuCity-hosted group agent?** Ask via [zucity.org](https://zucity.org)
 contact or the group chat above. If it ships, this section and
