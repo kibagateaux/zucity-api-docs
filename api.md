@@ -120,11 +120,11 @@ curl 'https://zucity.org/api/calendars?format=json&communityName=zucity&startDat
 
 The `inventory` array here is **chain-derived**: prices are onchain token base units (USDC 6 decimals — `"35000000000"` = 35,000 USDC) and `manager`/`token` are the real transaction-layer values, including booked-day data per item. This is the recommended availability source when you have no RPC.
 
-`GET /api/calendars/{slug}` — same shape scoped to one community (`/api/calendars/zujapan`) or one wallet (`/api/calendars/0x…` → that user's reservations). Subscribe to the ICS URL for live calendar feeds.
+`GET /api/calendars/{slug}` — same shape scoped to one community (`/api/calendars/zujapan`) or one wallet (`/api/calendars/0x…` → that user's reservations). Subscribe to the ICS URL for live calendar feeds — one-click Google/webcal subscribe flows: [integrations.md](integrations.md).
 
 ### GET /api/luma
 
-Scraped events from affiliated Luma calendars (17 live at verification). No parameters. Returns `{success, calendars, events[], scraped_at}` with Luma-shaped events (`api_id`, `name`, `cover_url`, dates, URL). Use for "what's happening" answers; ticketed ZuCity events also appear in `/api/inventory` as `itemtype=ticket`.
+Scraped events from affiliated Luma calendars — the live list is the response's `calendars` array. No parameters. Returns `{success, calendars, events[], scraped_at}` with Luma-shaped events (`api_id`, `name`, `cover_url`, dates, URL). Use for "what's happening" answers; ticketed ZuCity events also appear in `/api/inventory` as `itemtype=ticket`. Organizer propagation workflow: [integrations.md](integrations.md).
 
 ## tRPC endpoints over HTTP
 

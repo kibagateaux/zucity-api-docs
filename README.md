@@ -48,6 +48,7 @@ Discover via REST, **transact via the chain** (or hand off to zucity.org). Never
 | [`skills.md`](skills.md) | agents | operating manual: 5 workflows, decision tree, guardrails |
 | [`api.md`](api.md) | developers | REST + tRPC reference, auth, rate limits, Stripe checkout, use cases (trip / retreat / popup city) |
 | [`contracts.md`](contracts.md) | integrators | addresses, structs, date encoding, purchase chronology, lifecycle, errors |
+| [`integrations.md`](integrations.md) | everyone | out-of-app rails: calendar subscribe (Google / webcal), Luma event propagation, agent-in-group-chat status + duties |
 | [`facts.json`](facts.json) | machines | ground truth: addresses, enums, limits, verified samples |
 | [`zucity-mcp.js`](zucity-mcp.js) + [`package.json`](package.json) | agent runtimes | single-file MCP server, 12 tools, keyless by design |
 | [`AGENTS.md`](AGENTS.md) | maintainers | the editing law: verify-before-edit, evidence rules, smoke gate, release stamps |
