@@ -2,7 +2,7 @@
 
 Public integration companion for [zucity.org](https://zucity.org) — a booking platform for curated coliving homes, rooms, venues, event tickets, and memberships across rural Japan (Komoro/Nagano hub + Hokkaido, Kyūshū, Tokyo partners). Bookings settle **onchain** (USDC on Ethereum mainnet; every booking is an ERC-721 receipt NFT) or **by card** (Stripe).
 
-**For AI agents:** start at [`llms.txt`](llms.txt) → [`skills.md`](skills.md). **For developers:** [`api.md`](api.md) + [`contracts.md`](contracts.md). **For programs:** [`facts.json`](facts.json) is the machine-readable ground truth. **Editing these docs (human or agent):** the law is [`AGENTS.md`](AGENTS.md).
+**For AI agents:** start at [`llms.txt`](llms.txt) → [`SKILL.md`](skills/zucity-booking/SKILL.md). **For developers:** [`api.md`](api.md) + [`contracts.md`](contracts.md). **For programs:** [`facts.json`](facts.json) is the machine-readable ground truth. **Editing these docs (human or agent):** the law is [`AGENTS.md`](AGENTS.md). **Beyond the API** (calendars, Luma events, chat, self-hosting): [`integrations.md`](integrations.md).
 
 ## 60-second start
 
@@ -38,14 +38,16 @@ flowchart LR
 
 Discover via REST, **transact via the chain** (or hand off to zucity.org). Never price a booking from discovery metadata — quote it.
 
-> 💸 **Agents get paid — in the open.** Pass your own wallet as `referrer` in an onchain purchase and the contract pays you a split **in the same transaction** (10% verified on Sepolia — real receipts on record; mainnet has no public fee getter — verify empirically). Card bookings attribute via `referralCode`. Disclose the fee to whoever you book for: it comes out of the listing's `totalPaid`, not added to their price ([skills.md → Acting for a principal](skills.md#acting-for-a-principal)). Details: [contracts.md → Referral fees](contracts.md#referral-fees).
+> 💸 **Agents get paid — in the open.** Pass your own wallet as `referrer` in an onchain purchase and the contract pays you a split **in the same transaction** (10% verified on Sepolia — real receipts on record; mainnet has no public fee getter — verify empirically). Card bookings attribute via `referralCode`. Disclose the fee to whoever you book for: it comes out of the listing's `totalPaid`, not added to their price ([SKILL.md → Acting for a principal](skills/zucity-booking/SKILL.md#acting-for-a-principal)). Details: [contracts.md → Referral fees](contracts.md#referral-fees).
 
 ## Repo map
 
 | File | For | What's inside |
 |---|---|---|
 | [`llms.txt`](llms.txt) | agents | spec-compliant index of everything here + live endpoints |
-| [`skills.md`](skills.md) | agents | operating manual: 5 workflows, decision tree, guardrails |
+| [`skills/zucity-booking/SKILL.md`](skills/zucity-booking/SKILL.md) | agents | operating manual (installable skill): 5 workflows, decision tree, guardrails |
+| [`integrations.md`](integrations.md) | everyone | out-of-app rails: calendar subscribe, Luma event publishing, chat surfaces, run your own agent |
+| [`CLAUDE.md`](CLAUDE.md) + [`MEMORY.md`](MEMORY.md) | agent runtimes | session bootstrap + persistence seed for agents working in a clone |
 | [`api.md`](api.md) | developers | REST + tRPC reference, auth, rate limits, Stripe checkout, use cases (trip / retreat / popup city) |
 | [`contracts.md`](contracts.md) | integrators | addresses, structs, date encoding, purchase chronology, lifecycle, errors |
 | [`facts.json`](facts.json) | machines | ground truth: addresses, enums, limits, verified samples |
@@ -65,6 +67,7 @@ Every endpoint, address, enum value, and example in this repo was executed again
 
 ## Changes
 
+- **2026-07-17** — agent harness + out-of-app integrations (docs revision; source state unchanged at `zucity-webapp@6eff31e`). **Supersedes** the root `skills.md` path: the operating manual is now the installable skill [`skills/zucity-booking/SKILL.md`](skills/zucity-booking/SKILL.md) (a pointer stub remains at `skills.md` — update cached URLs; content unchanged apart from relative-link depth). New: [`CLAUDE.md`](CLAUDE.md), [`MEMORY.md`](MEMORY.md), [`integrations.md`](integrations.md) (calendar subscribe, Luma event publishing, chat surfaces at verified status — no official chat bot exists as of 2026-07-17, see `facts.json .notSupported` — and run-your-own-agent), facts.json urls for calendar/Luma/Telegram + `.meta.docsRevision` bump.
 - **2026-07-12** — agent-era layer (docs revision; source state unchanged at `zucity-webapp@6eff31e`). **Supersedes** the repo's own address: self-links previously said `zucity/api-docs` (does not resolve) — canonical is `kibagateaux/zucity-api-docs`; update cached URLs. New: [`reputation.md`](reputation.md), [`AGENTS.md`](AGENTS.md), principal duties + privacy disclosure, llms.txt drift directive, MCP **0.2.0** (**12 tools**, was 9), `facts.json .meta.docsRevision`.
 - **2026-07-03** — initial release, generated from `zucity-webapp@6eff31e`. Supersedes any older integration notes you may have seen: the current registry has **11 item types** (not 6), no `itemsCounter()` function, and per-receipt independent dates in bulk purchases.
 

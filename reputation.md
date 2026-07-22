@@ -65,7 +65,7 @@ strongest "I was there" primitive here (`Pending` proves payment, not
 presence); weight bound tokens when reading history as reputation —
 attestations that can be sold stop proving participation. The flip side is
 privacy: all of this is public — see receipts-are-public in
-[skills.md](skills.md) guardrails and [contracts.md](contracts.md) before
+[SKILL.md](skills/zucity-booking/SKILL.md) guardrails and [contracts.md](contracts.md) before
 booking on someone's behalf.
 
 ## Persisting across sessions

@@ -188,7 +188,7 @@ stateDiagram-v2
 - **Verified on Sepolia**: `referrerFeeBPS() = 1000` (10%), and live receipts 0 and 2 each record exactly 10% of `totalPaid` as `referrerFee`.
 - The mainnet deployment does not expose a public fee getter — verify the current mainnet split empirically (read `receipts(id).referrerFee` after a small purchase) rather than assuming a number.
 - This is the agent monetization hook: pass **your own wallet** as `referrer` when assembling purchases for users. No registration required.
-- **Disclose the fee to whoever you buy for.** It is paid out of `totalPaid` — `getPriceAndDiscountRate` takes no referrer argument, so the split does not change the buyer's quote. Disclosure is an integration requirement (skills.md § Acting for a principal).
+- **Disclose the fee to whoever you buy for.** It is paid out of `totalPaid` — `getPriceAndDiscountRate` takes no referrer argument, so the split does not change the buyer's quote. Disclosure is an integration requirement (SKILL.md § Acting for a principal).
 
 ## Events (for indexing)
 
