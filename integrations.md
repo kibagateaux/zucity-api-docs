@@ -1,7 +1,7 @@
 # Out-of-app integrations
 
 Four ways to work with ZuCity beside the booking API. Live-verified
-2026-07-17; the URLs below are also machine-readable in
+2026-07-22; the URLs below are also machine-readable in
 [facts.json](facts.json) `.urls`.
 
 ## 1 — Subscribe: ZuCity events in your calendar
@@ -11,12 +11,12 @@ Four ways to work with ZuCity beside the booking API. Live-verified
 - **Google Calendar, one click**: open
   <https://zucity.org/api/calendars?format=google> — it 302-redirects into
   Google's add-by-URL flow (`cid=webcal://zucity.org/api/calendars`).
-  Confirm **Add calendar**; it then stays current on Google's refresh cycle
-  (feed publishes a 1-week TTL).
+  Confirm there (guidance — Google's standard subscribe flow; the feed
+  publishes a 1-week TTL).
 - **Apple / Outlook / anything webcal**:
   `https://zucity.org/api/calendars?format=ical` 302-redirects to
-  `webcal://zucity.org/api/calendars` — open it and your OS calendar
-  subscribes.
+  `webcal://zucity.org/api/calendars` (guidance — opening a `webcal://` URL
+  triggers your calendar app's standard subscribe flow).
 - **Raw ICS** (default, no auth): `GET https://zucity.org/api/calendars` →
   `text/calendar` including affiliated community events (Luma-sourced
   `luma-evt-*` entries). Scope it with the params in
@@ -37,18 +37,20 @@ calendar from §1."*
 The canonical calendar is **[ZuCity Japan · Events
 Calendar](https://lu.ma/calendar/cal-yDGHl0U0okdzyJv)** on Luma, linked
 from [zucity.org/en/events](https://zucity.org/en/events) alongside the
-affiliated community calendars it aggregates (7 at verification, including
-ADDress, Code for Japan, Fracton Ventures, Centrum, ETH Tokyo).
+affiliated community calendars it aggregates — list them live via
+`GET /api/luma` (ADDress, Code for Japan, Fracton Ventures, Centrum and
+ETH Tokyo among them at verification).
 
 1. Create your event on [Luma](https://lu.ma) as usual.
 2. Submit it to the ZuCity Japan calendar from the calendar page above
    (Luma's standard submit-to-calendar flow; guidance — calendar admins
    review submissions before they appear).
-3. Once listed, propagation is automatic — verified chain: the calendar is
-   scraped into `GET /api/luma`, its events ride the ICS feed as
-   `luma-evt-*` entries, and every §1 subscription (Google included)
-   updates from that feed. The zucity.org events page links the same
-   calendar.
+3. Once listed, propagation is automatic. Live-verified links: the
+   calendar is scraped into `GET /api/luma`, its events ride the ICS feed
+   as `luma-evt-*` entries, and the zucity.org events page links the same
+   calendar. Subscribed calendars from §1 (Google included) then update
+   from that ICS feed on their own refresh cycles (derived — platform-side
+   refresh not separately verified).
 4. Selling tickets through ZuCity itself (`itemtype=ticket` in
    `/api/inventory`) is a listing-manager action — arrange it via
    [zucity.org](https://zucity.org) (contact links in the site footer).
@@ -56,13 +58,14 @@ ADDress, Code for Japan, Fracton Ventures, Centrum, ETH Tokyo).
 ## 3 — Chat: ZuCity in your group
 
 **No official ZuCity bot exists today for Discord, Telegram, or WhatsApp**
-(verified absent 2026-07-17; machine-readable in
+(verified absent 2026-07-22; machine-readable in
 [facts.json](facts.json) `.notSupported`). What exists now:
 
 - **Telegram community** (verified live): join via the invite on
   [zucity.org](https://zucity.org) — `https://t.me/+hqHkbnXdw4ZjMDVh`.
-- **Member Discord**: a membership perk, gated — see memberships on
-  zucity.org.
+- **Discord community** (verified live): public invite
+  `https://discord.gg/33SZszV3P4` — the "ZuCity x Zaibotsu" server, linked
+  from zucity.org (member-gated areas are a membership perk).
 - **Want ZuCity answers inside your own group?** Run your own agent (§4)
   with any bot framework and wire it to the keyless MCP server. Your bot,
   your rules — it uses the same public surface documented here; nothing

@@ -4,7 +4,8 @@ Anchors worth keeping across sessions. Pointer-shaped by design: values
 live in the linked files, never here.
 
 - **Canonical repo**: `github.com/kibagateaux/zucity-api-docs` — older
-  `zucity/api-docs` self-links are dead; update cached URLs.
+  `zucity/api-docs` self-links are dead; update cached URLs. The index of
+  everything is [llms.txt](llms.txt).
 - **Freshness walk (≤2 calls)**: fetch [facts.json](facts.json) (or MCP
   `get_facts`) → compare `.meta.docsRevision` + `.meta.generatedAt` to your
   cache; changed → read README `## Changes` and re-read only the files it

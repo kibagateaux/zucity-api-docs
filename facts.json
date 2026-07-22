@@ -2,7 +2,7 @@
   "meta": {
     "name": "zucity-api-docs facts",
     "generatedAt": "2026-07-03",
-    "docsRevision": "2026-07-17",
+    "docsRevision": "2026-07-22",
     "docsRevisionNote": "docs-layer revision (agent harness files + out-of-app integrations); generatedAt unchanged — source state is still zucity-webapp@6eff31e",
     "sourceState": "zucity-webapp@6eff31e (private repo, main)",
     "verification": "every value below was verified against live zucity.org HTTP responses and live eth_call reads on 2026-07-03; regenerate per release",
@@ -122,7 +122,8 @@
     "calendarGoogleImport": "https://zucity.org/api/calendars?format=google",
     "calendarWebcalImport": "https://zucity.org/api/calendars?format=ical",
     "lumaCalendar": "https://lu.ma/calendar/cal-yDGHl0U0okdzyJv",
-    "telegramCommunity": "https://t.me/+hqHkbnXdw4ZjMDVh"
+    "telegramCommunity": "https://t.me/+hqHkbnXdw4ZjMDVh",
+    "discordCommunity": "https://discord.gg/33SZszV3P4"
   },
   "liveVerifiedSamples": {
     "inventoryCount": 142,
@@ -142,6 +143,6 @@
     "no public refund API — cancellations go through cancel(receiptId) and incur up to cancelFeeBps (30%)",
     "items priced in JPY are fiat-path only (the JPY pay token address 0x...004A is a placeholder, not a deployed ERC20)",
     "the REST inventory price/manager fields are display metadata and can drift from the chain — never build transactions from them",
-    "no official ZuCity bot exists on Discord, Telegram, or WhatsApp (verified absent 2026-07-17) — join the community Telegram group (urls.telegramCommunity) or run your own agent against the public surface (integrations.md § 4)"
+    "no official ZuCity bot exists on Discord, Telegram, or WhatsApp (verified absent 2026-07-22) — join the community Telegram group (urls.telegramCommunity) or Discord server (urls.discordCommunity), or run your own agent against the public surface (integrations.md § 4)"
   ]
 }
