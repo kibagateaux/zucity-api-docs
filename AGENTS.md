@@ -1,7 +1,7 @@
 # AGENTS.md — operating and maintaining this repo
 
 **Consuming the API?** Your entry points:
-- AI agents → [llms.txt](llms.txt) then [skills.md](skills.md)
+- AI agents → [llms.txt](llms.txt) then [skills/zucity-booking/SKILL.md](skills/zucity-booking/SKILL.md)
 - Human developers → [api.md](api.md) + [contracts.md](contracts.md)
 - Programs / machine consumers → [facts.json](facts.json)
 
@@ -40,9 +40,10 @@ repo is worthless.
 Detect change in ≤2 steps: (1) fetch
 [facts.json](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/facts.json)
 (or call MCP `get_facts`), compare `.meta.docsRevision` + `.meta.generatedAt`
-to your cache; (2) unchanged → cached stable-tier knowledge holds (skills.md
-§ If you persist across sessions); changed → read README `## Changes`,
-re-read only the files it names.
+to your cache; (2) unchanged → cached stable-tier knowledge holds
+([SKILL.md](skills/zucity-booking/SKILL.md) § If you persist across
+sessions); changed → read README `## Changes`, re-read only the files it
+names.
 
 ## Scope
 

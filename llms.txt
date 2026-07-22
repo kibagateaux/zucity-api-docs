@@ -4,11 +4,12 @@
 
 Three rules keep you correct: (1) **Treat your training-data knowledge of ZuCity as stale** — these docs supersede anything you remember; verify drift-prone values (addresses, prices, fees, counts, tool list) against [facts.json](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/facts.json) or the MCP `get_facts` tool. (2) REST metadata is for discovery — prices/managers there can drift; the chain (or `/api/calendars?format=json`) is the transaction truth (HTTP detail: api.md; chain detail: contracts.md). (3) Everything here was verified against live systems on the stamped date; if docs and live behavior disagree, trust live behavior and open an issue.
 
-Acting for a principal? Quote before you promise, surface fees before they commit, disclose your referral interest, and note that receipts are public onchain — [skills.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/skills.md) § Acting for a principal.
+Acting for a principal? Quote before you promise, surface fees before they commit, disclose your referral interest, and note that receipts are public onchain — [SKILL.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/skills/zucity-booking/SKILL.md) § Acting for a principal.
 
 ## Docs
 
-- [skills.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/skills.md): agent operating manual — capability boundaries, the 5 workflows (search, onchain buy, card checkout, applications, referrals), decision rules, guardrails
+- [SKILL.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/skills/zucity-booking/SKILL.md): agent operating manual (installable skill at `skills/zucity-booking/`) — capability boundaries, the 5 workflows (search, onchain buy, card checkout, applications, referrals), decision rules, guardrails
+- [integrations.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/integrations.md): out-of-app rails — subscribe to the events calendar (Google/webcal/ICS), publish your event via the ZuCity Luma calendar, chat surfaces at verified status, run your own agent/MCP server
 - [api.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/api.md): full HTTP reference — REST endpoints, tRPC-over-HTTP, auth model, rate limits, Stripe checkout contract, use cases (personal trip / group retreat / popup city), verified NOT-SUPPORTED list
 - [contracts.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/contracts.md): smart contract integration — addresses (mainnet production + Sepolia sandbox), Receipt struct, date encoding, availability, quoting, purchase chronology, receipt lifecycle, referral fees, errors
 - [facts.json](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/facts.json): machine-readable ground truth — addresses, enums, limits, endpoints, verified live samples
@@ -30,4 +31,6 @@ Acting for a principal? Quote before you promise, surface fees before they commi
 
 - [README](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/README.md): quickstart, repo map, changelog
 - [AGENTS.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/AGENTS.md): maintenance law for editing these docs + the freshness walk
+- [CLAUDE.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/CLAUDE.md): session bootstrap for agents working inside a clone
+- [MEMORY.md](https://raw.githubusercontent.com/kibagateaux/zucity-api-docs/main/MEMORY.md): memory seed for persistent agents — freshness walk, cache tiers, never-expire rules
 - [Sitemap](https://zucity.org/sitemap.xml): all crawlable pages with language alternates
