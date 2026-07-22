@@ -7,23 +7,24 @@ Four ways to work with ZuCity beside the booking API. Live-verified
 ## 1 — Subscribe: ZuCity events in your calendar
 
 *Traveler: "I want ZuCity events in the calendar I already live in."*
+Pick the first option that fits:
 
-- **Google Calendar, one click**: open
+1. **Google Calendar, one click**: open
   <https://zucity.org/api/calendars?format=google> — it 302-redirects into
   Google's add-by-URL flow (`cid=webcal://zucity.org/api/calendars`).
   Confirm there (guidance — Google's standard subscribe flow; the feed
   publishes a 1-week TTL).
-- **Apple / Outlook / anything webcal**:
+2. **Apple / Outlook / anything webcal**:
   `https://zucity.org/api/calendars?format=ical` 302-redirects to
   `webcal://zucity.org/api/calendars` (guidance — opening a `webcal://` URL
   triggers your calendar app's standard subscribe flow).
-- **Raw ICS** (default, no auth): `GET https://zucity.org/api/calendars` →
+3. **Raw ICS** (default, no auth): `GET https://zucity.org/api/calendars` →
   `text/calendar` including affiliated community events (Luma-sourced
   `luma-evt-*` entries). Scope it with the params in
   [api.md → GET /api/calendars](api.md#get-apicalendars) (`communityName`,
   `city`, `startDate`/`endDate`) or per community/wallet via
   `/api/calendars/{slug}`.
-- Agents: hand your user the `format=google` link verbatim — no auth, no
+4. Agents: hand your user the `format=google` link verbatim — no auth, no
   key, nothing to configure.
 
 Hosts: this feed is also where your published event reaches subscribers — §2.
@@ -52,8 +53,8 @@ ETH Tokyo among them at verification).
    from that ICS feed on their own refresh cycles (derived — platform-side
    refresh not separately verified).
 4. Selling tickets through ZuCity itself (`itemtype=ticket` in
-   `/api/inventory`) is a listing-manager action — arrange it via
-   [zucity.org](https://zucity.org) (contact links in the site footer).
+   `/api/inventory`) is a listing-manager action — reach the team via the
+   community channels in §3.
 
 ## 3 — Chat: ZuCity in your group
 
