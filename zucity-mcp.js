@@ -276,9 +276,40 @@ async function resolveAndQuote(items, buyerAddress, recipientAddress) {
 // ---------------------------------------------------------------------------
 const server = new McpServer({ name: "zucity", version: "0.2.0" });
 
+// /api/inventory is a static build artifact (2026-08 static-delivery
+// release): the server ignores query strings and always returns the full
+// catalog, so this tool fetches once and applies the SAME AND-combined
+// predicates locally. The tool's filter interface is unchanged, and local
+// filtering yields identical results against pre-release servers too.
+const invMatch = {
+  itemtype: (i, v) =>
+    /^\d+$/.test(v.trim())
+      ? i.itemType === Number(v.trim())
+      : String(i.itemTypeLabel).toLowerCase() === v.trim().toLowerCase(),
+  paytoken: (i, v) => (i.paymentToken ?? "").toLowerCase() === v.toLowerCase(),
+  community: (i, v) => (i.community ?? []).some((c) => c.toLowerCase() === v.toLowerCase()),
+  region: (i, v) => (i.city?.[0] ?? "").toLowerCase() === v.toLowerCase(),
+  city: (i, v) => (i.city?.[1] ?? "").toLowerCase() === v.toLowerCase(),
+  capacity: (i, v) => i.maxOccupancy != null && i.maxOccupancy >= v,
+  tags: (i, v) => v.toLowerCase().split(",").map((t) => t.trim()).filter(Boolean)
+    .some((tag) => (i.tags ?? []).some((t) => t.toLowerCase() === tag)),
+  host: (i, v) => (i.manager ?? "").toLowerCase() === v.toLowerCase(),
+};
+// Date window: an item is visible when it has no targetDates or its window
+// overlaps [startdate, enddate] (open ends inclusive).
+function invDateVisible(i, start, end) {
+  const td = i.targetDates;
+  if (!td || (td.startDate == null && td.endDate == null)) return true;
+  const s = td.startDate ? Date.parse(td.startDate) : -Infinity;
+  const e = td.endDate ? Date.parse(td.endDate) : Infinity;
+  const qs = start ? Date.parse(start) : -Infinity;
+  const qe = end ? Date.parse(end) : Infinity;
+  return s <= qe && qs <= e;
+}
+
 server.tool(
   "search_inventory",
-  "Search ZuCity's curated registry (rooms, suites, villas, venues, tickets, memberships…). Discovery layer: price/manager here are display metadata — quote_price is authoritative. Filters are AND-combined.",
+  "Search ZuCity's curated registry (rooms, suites, villas, venues, tickets, memberships…). Discovery layer: price/manager here are display metadata — quote_price is authoritative. Filters are AND-combined (applied client-side over the static full-catalog response).",
   {
     itemtype: z.string().optional().describe("ticket|membership|art|merch|room|suite|villa|venue|equipment or 0-10 (sponsorship=2, service=5 numeric only)"),
     region: z.string().optional(), city: z.string().optional(), community: z.string().optional(),
@@ -291,10 +322,14 @@ server.tool(
   },
   async (args) => {
     try {
-      const { id, limit, ...filters } = args;
-      const qs = new URLSearchParams(Object.entries(filters).filter(([, v]) => v !== undefined && v !== ""));
-      const data = await jfetch(`${BASE}/api/inventory${qs.size ? `?${qs}` : ""}`);
+      const { id, limit, startdate, enddate, ...filters } = args;
+      const data = await jfetch(`${BASE}/api/inventory`);
       let items = data.items ?? [];
+      for (const [k, v] of Object.entries(filters)) {
+        if (v === undefined || v === "" || !invMatch[k]) continue;
+        items = items.filter((i) => invMatch[k](i, v));
+      }
+      if (startdate || enddate) items = items.filter((i) => invDateVisible(i, startdate, enddate));
       if (id) items = items.filter((i) => String(i.id) === String(id));
       const trimmed = items.slice(0, limit ?? 20).map((i) => ({
         ...i,
@@ -303,8 +338,8 @@ server.tool(
           : "indicative display price — call quote_price before quoting the user",
       }));
       return ok(
-        { count: data.count, returned: trimmed.length, items: trimmed },
-        { type: "rest", detail: `GET ${BASE}/api/inventory (cached ~60s; 30 req/min)` },
+        { count: items.length, returned: trimmed.length, items: trimmed },
+        { type: "rest", detail: `GET ${BASE}/api/inventory (static build artifact; filtered client-side; catalog ${data.count})` },
       );
     } catch (e) { return fail(e); }
   },
@@ -615,8 +650,16 @@ async function selftest() {
     catch (e) { results.push([name, "FAIL", e.message]); }
   };
   await step("REST /api/inventory", async () => {
-    const d = await jfetch(`${BASE}/api/inventory?itemtype=room&capacity=2`);
-    return `${d.count} rooms`;
+    // Static full-catalog body (query strings ignored server-side); prove
+    // the local filter path the search_inventory tool uses.
+    const d = await jfetch(`${BASE}/api/inventory`);
+    const rooms = (d.items ?? []).filter(
+      (i) => invMatch.itemtype(i, "room") && invMatch.capacity(i, 2),
+    );
+    if (!d.count || d.count !== (d.items ?? []).length) {
+      throw new Error(`count ${d.count} != items ${(d.items ?? []).length}`);
+    }
+    return `catalog ${d.count}; ${rooms.length} rooms(cap>=2) via local filter`;
   });
   await step("chain items(1)", async () => {
     const i = await readItem(1);
