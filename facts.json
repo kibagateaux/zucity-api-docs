@@ -97,7 +97,7 @@
     "queryEncoding": "GET {base}/{procedure}?input=<url-encoded JSON: {\"json\": <input>}>; response {\"result\":{\"data\":{\"json\": <output>}}}",
     "public": ["form.getBySlug", "form.getById", "form.listActive", "referral.resolveCode", "referral.trackClick", "note.getByReview", "note.getByReceipt", "note.getReviewAggregation", "bundle.getDiscountInfo", "bundle.getAllBundles"],
     "authenticated": ["form.submit", "referral.getMyCode", "referral.attributeBooking", "referral.getMyStats", "note.createReview", "member.upsert", "member.setMyUsername", "member.update", "product.toggleMyWishlist", "product.getMyWishlist"],
-    "authHeader": "Authorization: Bearer <PRIVY_JWT> (obtained by logging in at zucity.org; there are no API keys)"
+    "authHeader": "Authorization: Bearer <PRIVY_JWT>. Agents are welcome: the operator signs up once in a browser at https://zucity.org/en/about/zucity/agent (Privy email or wallet) and the agent runs on the resulting short-lived session JWT. No API keys, no OAuth, no programmatic signup endpoint — account creation is browser-only; refresh the JWT from an active browser session when it expires"
   },
   "referral": {
     "code": "the member's username; regex ^[a-zA-Z0-9_-]{3,30}$",
@@ -137,7 +137,7 @@
     "GET /api/inventory/{id} does not exist (404) — fetch /api/inventory and select by id client-side",
     "POST /api/inventory returns 405 — the inventory API is read-only",
     "no free-text search parameter — use the documented filters",
-    "no API keys and no programmatic signup — authenticated calls require a Privy session JWT from zucity.org",
+    "no API keys and no programmatic signup — this is a missing rail, not a policy; agents are welcome, but the operator must create the account in a browser at https://zucity.org/en/about/zucity/agent and authenticated calls then use that session's Privy JWT",
     "tRPC mutations are never called via GET",
     "no itemsCounter() function — enumerate the registry via allItems(...) or /api/calendars?format=json",
     "no public refund API — cancellations go through cancel(receiptId) and incur up to cancelFeeBps (30%)",

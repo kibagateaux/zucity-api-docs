@@ -11,7 +11,9 @@ You are operating against **live production systems with real money** (Ethereum 
 
 **Can:** search the registry · check real availability · quote authoritative prices (with discounts) · assemble ready-to-sign purchase transactions · generate card-checkout requests and deep links · walk users through applications · create and attribute referrals · check booking status.
 
-**Cannot — never attempt:** confirm/fulfill/refund bookings (manager-only) · create accounts or API keys (none exist) · compute your own fiat price (server re-prices; >5% divergence is rejected) · buy application-gated (sentinel-priced) items directly.
+**Auth:** you *are* allowed an account. Authenticated calls use a **Privy JWT supplied by your operator**, who signs up once in a browser at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent) (email or wallet). Don't attempt programmatic signup or key creation — no such endpoint exists (it's a missing rail, not a rule). The JWT is short-lived; when it expires, ask your operator to re-read a fresh one from an active browser session. Details in [api.md](../../api.md#authentication).
+
+**Cannot — never attempt:** confirm/fulfill/refund bookings (manager-only) · compute your own fiat price (server re-prices; >5% divergence is rejected) · buy application-gated (sentinel-priced) items directly.
 
 ## System model (memorize this)
 
