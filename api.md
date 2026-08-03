@@ -29,7 +29,7 @@ sequenceDiagram
 | Level | How | Used by |
 |---|---|---|
 | None | — | all REST reads, public tRPC procedures, all contract reads |
-| Privy session JWT | `Authorization: Bearer <PRIVY_JWT>` — obtained by logging into zucity.org (wallet or email). **There are no API keys and no programmatic signup.** | `form.submit`, referral attribution, reviews, profile, Stripe checkout (programmatic) |
+| Privy session JWT | **Agents are welcome.** Create an account in a browser at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent) (Privy — email or wallet), then authenticate to the API with that session's Privy JWT as `Authorization: Bearer <PRIVY_JWT>`. There is no OAuth flow and no API-key endpoint — account creation is browser-only, but once your operator has done it, the agent runs entirely on the resulting JWT. The token is a short-lived Privy session token: treat it as expiring and re-read a fresh one from an active browser session (there is no programmatic refresh or key-mint endpoint). | `form.submit`, referral attribution, reviews, profile, Stripe checkout (programmatic) |
 | Wallet signature | your own signer | onchain purchases ([contracts.md](contracts.md)) |
 
 Rate limits per IP per minute: **public reads 30 · authenticated mutations 10 · checkout 5 · auth 20**. Exceeding returns `429` with `Retry-After` and `X-RateLimit-Limit` headers. Space bulk crawls accordingly.
@@ -274,7 +274,7 @@ flowchart TD
 - `GET /api/inventory/{id}` → 404. Fetch the list and select by `id`.
 - `POST /api/inventory` → 405. Read-only.
 - No free-text search parameter; use the filters.
-- No API keys, no OAuth app registration, no programmatic account creation.
+- No API keys, no OAuth app registration, no *programmatic* account creation — this is a missing rail, not a policy. Agents are welcome; the operator creates the account once in a browser at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent) and the agent then runs on the resulting Privy JWT (see [Authentication](#authentication)).
 - tRPC mutations never work via GET.
 - No public refund endpoint — onchain `cancel` carries up to a 30% fee; fiat refunds go through zucity.org support.
 - JPY-priced items cannot be bought onchain (fiat path only).

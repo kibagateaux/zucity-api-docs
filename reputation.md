@@ -14,8 +14,12 @@ today ([api.md](api.md) · [contracts.md](contracts.md) ·
 | Execute an onchain purchase | the key-holder only | wallet signature |
 | Mutate offchain state (profile, reviews, applications, attribution) | a logged-in member | Privy session JWT from zucity.org |
 
-Agents assemble; principals sign. No API keys, no programmatic signup; the
-MCP server never holds keys. Authorization *is* the signature (or session).
+Agents assemble; principals sign. Agents are welcome to hold a session: the
+operator creates the account once in a browser at
+[zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent)
+and the agent runs on the resulting Privy JWT. There are no API keys and no
+programmatic signup endpoint — that is a missing rail, not a prohibition — and
+the MCP server never holds keys. Authorization *is* the signature (or session).
 
 ## The identity stack
 
