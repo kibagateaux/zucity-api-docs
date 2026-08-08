@@ -16,8 +16,8 @@ sequenceDiagram
     participant C as Client / agent
     participant R as zucity.org REST
     participant Z as ZuCitySystem (chain)
-    C->>R: GET /api/inventory?itemtype=room&region=nagano
-    R-->>C: matching items (metadata + listing ids)
+    C->>R: GET /api/inventory
+    R-->>C: full catalog (filter client-side: metadata + listing ids)
     C->>Z: items(id) — token, manager, real price
     C->>Z: isAvailable(id, year, startDay, daysCount)
     C->>Z: getPriceAndDiscountRate(receipts, buyer)
@@ -38,30 +38,44 @@ Rate limits per IP per minute: **public reads 30 · authenticated mutations 10 �
 
 ### GET /api/inventory
 
-Search the curated registry (142 items live). No auth. All filters AND-combined; **parameter names are case-insensitive**; responses cached ~60s.
+The full curated registry (142 items live) in one response. No auth, **no
+parameters**: the body is prerendered at deploy and served from the CDN, so
+any query string returns the same full catalog. Filter client-side on the
+item fields below — the MCP `search_inventory` tool does this for you and
+its filter interface is unchanged.
 
-| Param | Type | Notes |
+> **Contract change — 2026-08 static-delivery release.** Server-side query
+> filters (`itemtype`, `paytoken`, `community`, `region`, `city`,
+> `capacity`, `startdate`/`enddate`, `tags`, `host`) are retired. Requests
+> that still send them succeed and receive the full catalog with
+> `filters: {}` echoed. If you filtered via query params, apply the same
+> predicates to `items[]` locally.
+
+Client-side filtering field guide (the retired params map to these fields,
+all AND-combinable; string compares are case-insensitive):
+
+| Was param | Filter on | Notes |
 |---|---|---|
-| `itemtype` | string \| number | `ticket` `membership` `art` `merch` `room` `suite` `villa` `venue` `equipment`, or numeric `0`–`10`. `sponsorship` (2) and `service` (5) are **numeric-only** |
-| `paytoken` | string | exact symbol match, case-insensitive (e.g. `usdc`) |
-| `community` | string | e.g. `zucity`, `elelfa`, `address`, `midori` |
-| `region` | string | prefecture — matches the item's first city entry (e.g. `nagano`, `hokkaido`) |
-| `city` | string | town — e.g. `komoro` |
-| `capacity` | number | minimum occupancy, must be > 0 |
-| `startdate` / `enddate` | `YYYY-MM-DD` | strict format; items visible in the window |
-| `tags` | csv | matches ANY listed tag, e.g. `vip,coliving` |
-| `host` | string | manager id/address |
+| `itemtype` | `itemType` (number) / `itemTypeLabel` | labels: `Ticket` `Membership` `Art` `Merch` `Room` `Suite` `Villa` `Venue` `Equipment` (+ numeric-only `Sponsorship`=2, `Service`=5) |
+| `paytoken` | `paymentToken` | exact symbol match (e.g. `usdc`) |
+| `community` | `community[]` | any entry matches (e.g. `zucity`, `elelfa`) |
+| `region` | `city[0]` | prefecture (e.g. `nagano`, `hokkaido`) |
+| `city` | `city[1]` | town (e.g. `komoro`) |
+| `capacity` | `maxOccupancy` | non-null and ≥ your minimum |
+| `startdate`/`enddate` | `targetDates` | item visible when `targetDates` is null or its window overlaps yours |
+| `tags` | `tags[]` | any-of match |
+| `host` | `manager` | manager id/address |
 
-Verified request and trimmed live response:
+Request and trimmed response shape:
 
 ```bash
-curl 'https://zucity.org/api/inventory?itemtype=room&region=nagano&capacity=2'
+curl 'https://zucity.org/api/inventory'
 ```
 ```json
 {
   "success": true,
-  "filters": { "itemtype": "room", "region": "nagano", "capacity": 2 },
-  "count": 19,
+  "filters": {},
+  "count": 142,
   "items": [{
     "id": "5",
     "displayName": "ZuCity Master Bedroom",
@@ -84,6 +98,7 @@ Reading an item correctly:
 - `price: 0` **or** a non-null `externalPurchaseLink` → application-gated listing; send the user to `https://zucity.org/en{externalPurchaseLink}` (the onchain price is a sentinel — see [contracts.md](contracts.md#reading-the-registry)).
 - A positive `price` is display metadata in the token's display units — quote onchain before any purchase.
 - `id` is the onchain `listingId`.
+- `generated_at` is the deploy's build time — the catalog cannot change between deploys, so it is also the data's freshness stamp.
 
 ### GET /api/calendars
 

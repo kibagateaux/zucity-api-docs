@@ -2,8 +2,8 @@
   "meta": {
     "name": "zucity-api-docs facts",
     "generatedAt": "2026-07-03",
-    "docsRevision": "2026-07-22",
-    "docsRevisionNote": "docs-layer revision (agent harness files + out-of-app integrations); generatedAt unchanged — source state is still zucity-webapp@6eff31e",
+    "docsRevision": "2026-08-02",
+    "docsRevisionNote": "inventory filter retirement (2026-08 static-delivery release): /api/inventory is a static build artifact — query params ignored, full catalog with filters:{} echo; search_inventory MCP tool filters client-side, interface unchanged; generatedAt unchanged — other values still verified against the 2026-07-03 pass",
     "sourceState": "zucity-webapp@6eff31e (private repo, main)",
     "verification": "every value below was verified against live zucity.org HTTP responses and live eth_call reads on 2026-07-03; regenerate per release",
     "docs": "https://github.com/kibagateaux/zucity-api-docs"

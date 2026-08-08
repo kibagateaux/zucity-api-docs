@@ -17,7 +17,7 @@ Acting for a principal? Quote before you promise, surface fees before they commi
 
 ## Live endpoints
 
-- [Inventory search](https://zucity.org/api/inventory): GET, no auth — 142 curated items, filterable by itemtype/region/city/capacity/dates/tags
+- [Inventory catalog](https://zucity.org/api/inventory): GET, no auth, no params — 142 curated items as one static build artifact; filter client-side (itemtype/region/city/capacity/dates/tags — the MCP search_inventory tool does this for you)
 - [Calendars & chain bridge](https://zucity.org/api/calendars?format=json): GET, no auth — events, reservations, and the chain-derived registry (real prices, booked days) over REST
 - [Luma events](https://zucity.org/api/luma): GET, no auth — affiliated community events
 - [Site llms.txt](https://zucity.org/llms.txt): who/what ZuCity is, locations, communities, contact
