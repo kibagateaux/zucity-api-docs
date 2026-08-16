@@ -100,7 +100,7 @@ If/then:
 
 **Two distinct rails — do not conflate them** (full comparison: [api.md § Referrals](../../api.md#referrals)):
 1. **CASH — onchain, keyed to your WALLET**: pass your wallet as `referrer` in every `buy`/`bulkBuy` you assemble; the contract pays your split in the same transaction. Rate = 10% (mainnet `referrerFeeBps()` / Sepolia `referrerFeeBPS()`; read the getter, it's manager-mutable). Needs only a wallet — no account. Earns cash and **no points**.
-2. **POINTS — off-chain, keyed to your USERNAME**: claim a username (`member.setMyUsername`, `^[a-zA-Z0-9_-]{3,30}$`, needs JWT), then append `?ref=<username>` to every zucity.org link you share and set `referralCode` in fiat checkouts. Converted bookings earn **points** (`referral.attributeBooking`; idempotent; self-referral blocked; track with `referral.getMyStats`) towards exclusive member rewards like swag, free stays, private events, and airdrops . Earns points and **no cash**.
+2. **POINTS — off-chain, keyed to your USERNAME**: claim a username (`member.setMyUsername`, `^[a-zA-Z0-9_-]{3,30}$`, needs JWT), then append `?ref=<username>` to every zucity.org link you share and set `referralCode` in fiat checkouts. Converted bookings earn **points** (`referral.attributeBooking`; idempotent; self-referral blocked; track with `referral.getMyStats`) towards exclusive member rewards like swag, free stays, private events, and airdrops. Earns points and **no cash**.
 
 Passing your wallet earns cash; sharing your username earns points; the two are not documented to stack on one booking. Disclose whichever you use to your principal (§ Acting for a principal).
 

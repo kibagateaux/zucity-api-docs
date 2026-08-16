@@ -3,7 +3,7 @@
     "name": "zucity-api-docs facts",
     "generatedAt": "2026-07-03",
     "docsRevision": "2026-08-16",
-    "docsRevisionNote": "docs-layer revision: new onchain deployment (mainnet ZuCitySystem -> JapanGlobalSystem, new ReceiptRenderer on both chains); agents are first-class self-onboarding accounts via Privy email OR wallet; the two referral paths (onchain wallet -> cash / username -> points -> eventual airdrop) are delineated. generatedAt unchanged — the REST/tRPC shape is still zucity-webapp@6eff31e",
+    "docsRevisionNote": "docs-layer revision: new onchain deployment (mainnet ZuCitySystem -> JapanGlobalSystem, new ReceiptRenderer on both chains); agents are first-class self-onboarding accounts via Privy email OR wallet; the two referral paths (onchain wallet -> cash / username -> points -> exclusive member rewards) are delineated. generatedAt unchanged — the REST/tRPC shape is still zucity-webapp@6eff31e",
     "sourceState": "zucity-webapp@6eff31e (private repo, main); contract addresses from the zucity-system deploy broadcast (run-latest)",
     "verification": "REST/tRPC shape verified against live zucity.org on 2026-07-03; contract addresses, fee getters, prices, and quotes re-verified via live eth_call on 2026-08-16; regenerate per release",
     "docs": "https://github.com/kibagateaux/zucity-api-docs"
@@ -117,7 +117,7 @@
     },
     "pathB_offchainPoints": {
       "needs": "a username (member account; create via member.setMyUsername) — your username IS your referral code",
-      "gets": "300 points per converted booking, toward an intended, unpriced future token airdrop (no guaranteed value, amount, or date)",
+      "gets": "points per converted booking, redeemable for exclusive member rewards like swag, free stays, private events, and airdrops (a loyalty program — no guaranteed cash value, amount, or date)",
       "how": "share https://zucity.org/?ref=<username>, pass referralCode in POST /api/stripe/checkout, or call referral.attributeBooking({referralCode, receiptIds})",
       "settles": "off-chain attribution only — nothing settles onchain; self-referral is blocked and attribution is idempotent per receipt",
       "appliesTo": "fiat (Stripe) and in-app bookings"

@@ -541,7 +541,7 @@ server.tool(
       else url = `${BASE}/${l}`;
       if (ref) url += `?ref=${encodeURIComponent(ref)}`;
       return ok(
-        { url, note: ref ? "conversions on this link attribute to your referral code (300 points per booking; onchain splits use the referrer address in buy/bulkBuy instead)" : "no ref code attached" },
+        { url, note: ref ? "conversions on this link attribute to your referral code (earn points toward exclusive member rewards; onchain splits use the referrer address in buy/bulkBuy instead)" : "no ref code attached" },
         { type: "static", detail: "URL patterns live-verified 2026-07-03" },
       );
     } catch (e) { return fail(e); }

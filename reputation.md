@@ -41,7 +41,7 @@ record.
 |---|---|---|
 | **Receipts** | ERC-721 (mainnet "Japan Global"/JPG; Sepolia "ZuCity Japan Network"/ZUJP); `Pending → Accepted → Redeemed/Canceled` | `receipts(id)`, `allReceipts(…)`, `ownerOf`, `Fulfill` events, `/api/calendars/{wallet}` |
 | **Reviews** | one per member per item, rating 1–5 | `note.getReviewAggregation` → `{averageRating, totalReviews, distribution[5]}`; `note.getByReview`; `note.getByReceipt` |
-| **Referral points** | 300 per converted booking; off-chain; idempotent; self-referral blocked; toward an intended, unpriced future token airdrop (no guaranteed value/date) — the **points** rail, keyed to your username, distinct from the onchain **cash** rail keyed to a wallet ([api.md § Referrals](api.md#referrals)) | own stats only: `referral.getMyStats` (JWT) |
+| **Referral points** | earned per converted booking; off-chain; idempotent; self-referral blocked; redeemable for exclusive member rewards (swag, free stays, private events, airdrops), a loyalty program with no guaranteed cash value — the **points** rail, keyed to your username, distinct from the onchain **cash** rail keyed to a wallet ([api.md § Referrals](api.md#referrals)) | own stats only: `referral.getMyStats` (JWT) |
 | **Memberships** | registry items; live: id 0, `unlimited: true`, `transferable: false` | `/api/inventory?itemtype=membership`, `items(id)` |
 | **Standing** | input to the manager's ReceiptValidator at quote time | only via `getPriceAndDiscountRate` output |
 

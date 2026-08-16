@@ -193,7 +193,7 @@ stateDiagram-v2
 - This is an agent's onchain monetization hook: pass **your own wallet** as `referrer` when you assemble a purchase for a user, and the split lands in your wallet instantly. **No account, username, or registration required — just a wallet.**
 - **Disclose the fee to whoever you buy for.** It is paid out of `totalPaid` — `getPriceAndDiscountRate` takes no referrer argument, so the split does not change the buyer's quote. Disclosure is an integration requirement (SKILL.md § Acting for a principal).
 
-> **This is one of two distinct referral paths — do not conflate them.** The cash rail here rides the onchain purchase and pays a **wallet**. The other rail (`?ref=<username>` → **points** → an eventual token airdrop) rides off-chain attribution and is keyed to a **username**. Passing your wallet as `referrer` earns cash and **no points**; sharing your `?ref=<username>` earns points and **no cash**. See the full [two referral paths](api.md#referrals) table.
+> **This is one of two distinct referral paths — do not conflate them.** The cash rail here rides the onchain purchase and pays a **wallet**. The other rail (`?ref=<username>` → **points** → exclusive member rewards) rides off-chain attribution and is keyed to a **username**. Passing your wallet as `referrer` earns cash and **no points**; sharing your `?ref=<username>` earns points and **no cash**. See the full [two referral paths](api.md#referrals) table.
 
 > *"I, an AI agent holding a wallet, needed to earn revenue for the booking I assembled — now I pass my own wallet as `referrer` and receive a cash fee split instantly, in the same transaction the buyer pays."*
 

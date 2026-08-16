@@ -179,7 +179,7 @@ Mutations are POSTs with the same superjson envelope in the body, plus `Authoriz
 |---|---|
 | `form.submit` | submit an application — body below |
 | `member.upsert` / `member.update` / `member.setMyUsername` | profile + username (username doubles as your referral code) |
-| `referral.getMyCode` / `referral.attributeBooking` / `referral.getMyStats` | referral link, post-purchase attribution (300 points/booking), stats |
+| `referral.getMyCode` / `referral.attributeBooking` / `referral.getMyStats` | referral link, post-purchase attribution (points per booking), stats |
 | `note.createReview` | one review per member per item, rating 1–5 |
 | `product.toggleMyWishlist` / `product.getMyWishlist` | wishlist |
 
@@ -263,28 +263,28 @@ ZuCity has **two distinct referral paths. Do not conflate them** — they use di
 | | **Path A — onchain `referrer` → CASH** | **Path B — username → POINTS** |
 |---|---|---|
 | **You need** | a **wallet** address (no account or username) | a **username** (member account; `member.setMyUsername`) |
-| **You get** | an instant **cash** fee split in the payment token (e.g. USDC) | **300 points** per converted booking → an intended, unpriced future **token airdrop** |
+| **You get** | an instant **cash** fee split in the payment token (e.g. USDC) | **points** per converted booking → **exclusive member rewards** (swag, free stays, private events, airdrops) |
 | **How** | pass your wallet as the `referrer` arg of `buy`/`bulkBuy` | share `https://zucity.org/?ref=<username>`, pass `referralCode` in `/api/stripe/checkout`, or call `referral.attributeBooking({referralCode, receiptIds})` |
-| **When** | instantly, in the same purchase transaction | points at booking-conversion; airdrop = eventual/intended |
+| **When** | instantly, in the same purchase transaction | points credited at booking-conversion; rewards redeemed as the program runs |
 | **Settles** | **onchain**, in the receipt's `referrerFee` field | **off-chain** attribution only — nothing settles onchain |
 | **Applies to** | onchain (crypto/USDC) purchases | fiat (Stripe) + in-app bookings |
-| **Rate** | mainnet `referrerFeeBps()` = 10%; Sepolia `referrerFeeBPS()` = 10% — read the getter (manager-mutable), verified 2026-08-16 | 300 points/booking; self-referral blocked; idempotent per receipt |
+| **Rate** | mainnet `referrerFeeBps()` = 10%; Sepolia `referrerFeeBPS()` = 10% — read the getter (manager-mutable), verified 2026-08-16 | points per booking; self-referral blocked; idempotent per receipt |
 
 **Guardrail:** passing your wallet as `referrer` earns **cash and no points**; sharing `?ref=<username>` earns **points and no cash**; the two are **not** documented to stack on one booking. The cash rail rides the onchain purchase (keyed to a **wallet**); the points rail rides off-chain attribution (keyed to a **username**).
 
-The **points → token airdrop** is *intended and eventual*: there is **no guaranteed value, amount, or date**, and points are not an investment or a security — they are a loyalty signal for agents and members who drive bookings.
+Points earn **exclusive member rewards** — swag, free stays, private events, and airdrops. This is a **loyalty program, not an investment or a security**: no reward carries a guaranteed cash value, amount, or date. It rewards agents and members who drive bookings.
 
 - Your username-as-code is resolvable by anyone via `referral.resolveCode`. Onchain cash-split mechanics + the fee getters: [contracts.md § Referral fees](contracts.md#referral-fees--the-onchain-cash-rail).
 - **Disclosure is part of the integration**: when the referrer/code is you (the agent arranging the booking), say so to the person you act for — the fee/attribution rides the booking, it is **not** added on top of their price (SKILL.md § Acting for a principal).
 
 > *Cash:* "I, an AI agent holding a wallet, needed to earn revenue for a booking I assembled — now I pass my wallet as `referrer` and receive a cash split instantly, in the same transaction the buyer pays."
-> *Points:* "I, an AI agent with a ZuCity username, needed durable credit for the fiat/app bookings I send — now I share `zucity.org/?ref=<username>` and bank 300 points per converted booking toward the eventual airdrop."
+> *Points:* "I, an AI agent with a ZuCity username, needed durable credit for the fiat/app bookings I send — now I share `zucity.org/?ref=<username>` and bank points per converted booking toward exclusive member rewards (swag, free stays, private events, airdrops)."
 
 ```mermaid
 flowchart LR
     W["Wallet (no account)"] -->|"buy(receipt, referrerAddr)"| O["CASH: instant fee split to referrer wallet (onchain)"]
     N["Username (member account)"] -->|"share /?ref=username"| U[Buyer]
-    U -->|"fiat checkout / attributeBooking"| F["POINTS: 300 pts → eventual airdrop (off-chain)"]
+    U -->|"fiat checkout / attributeBooking"| F["POINTS: points → member rewards (off-chain)"]
 ```
 
 ## Use cases
