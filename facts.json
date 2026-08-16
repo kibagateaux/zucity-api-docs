@@ -2,10 +2,10 @@
   "meta": {
     "name": "zucity-api-docs facts",
     "generatedAt": "2026-07-03",
-    "docsRevision": "2026-07-22",
-    "docsRevisionNote": "docs-layer revision (agent harness files + out-of-app integrations); generatedAt unchanged — source state is still zucity-webapp@6eff31e",
-    "sourceState": "zucity-webapp@6eff31e (private repo, main)",
-    "verification": "every value below was verified against live zucity.org HTTP responses and live eth_call reads on 2026-07-03; regenerate per release",
+    "docsRevision": "2026-08-16",
+    "docsRevisionNote": "docs-layer revision: new onchain deployment (mainnet ZuCitySystem -> JapanGlobalSystem, new ReceiptRenderer on both chains); agents are first-class self-onboarding accounts via Privy email OR wallet; the two referral paths (onchain wallet -> cash / username -> points -> eventual airdrop) are delineated. generatedAt unchanged — the REST/tRPC shape is still zucity-webapp@6eff31e",
+    "sourceState": "zucity-webapp@6eff31e (private repo, main); contract addresses from the zucity-system deploy broadcast (run-latest)",
+    "verification": "REST/tRPC shape verified against live zucity.org on 2026-07-03; contract addresses, fee getters, prices, and quotes re-verified via live eth_call on 2026-08-16; regenerate per release",
     "docs": "https://github.com/kibagateaux/zucity-api-docs"
   },
   "baseUrl": "https://zucity.org",
@@ -13,23 +13,28 @@
     "1": {
       "role": "production — REAL FUNDS",
       "name": "Ethereum mainnet",
-      "zuCitySystem": "0x9485d36B0bD495c25b9F3b7c910649a1EE7d3b63",
-      "receiptValidatorDefault": "0xdE7F0E8eeA39d015767E09f533E0f8628779348E",
+      "zuCitySystem": "0xe94320a13359dd9ec7b99d1a210d146583c5c90e",
+      "systemName": "JapanGlobalSystem (renamed from ZuCitySystem; the zuCitySystem key holds the address for back-compat)",
+      "receiptValidatorDefault": "0x6bcf7944fcb333cf4c414f2b8fa97786297f4177",
+      "receiptRenderer": "0x3f83af192b947e0f13e6727554b702d08673d54d",
       "paymentToken": {
         "symbol": "USDC",
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6
       },
-      "nft": { "name": "ZuCity Japan Network", "symbol": "ZUJP" },
+      "nft": { "name": "Japan Global", "symbol": "JPG" },
       "cancelFeeBps": 3000,
-      "referrerFeeBpsGetter": "absent on this deployment — do not call referrerFeeBPS() on mainnet; buy/bulkBuy still accept a referrer address and the Receipt struct records referrerFee",
-      "notes": "per-manager validator via managerConfigs(manager); e.g. managerConfigs(0xD5127bC47F023B13337ff017988351ab826456dC) = 0x77B573C62f3fD169F62FeA6312BC329bCe986e84"
+      "referrerFeeBps": 1000,
+      "referrerFeeBpsGetter": "referrerFeeBps() returns 1000 = 10% (verified onchain 2026-08-16); a manager can change it, so read the getter for the current value and read receipts(id).referrerFee for what a specific receipt paid",
+      "notes": "per-manager validator via managerConfigs(manager); managerConfigs(0xD5127bC47F023B13337ff017988351ab826456dC) = 0x0 (falls back to receiptValidatorDefault)"
     },
     "11155111": {
       "role": "sandbox (Sepolia testnet)",
       "name": "Ethereum Sepolia",
-      "zuCitySystem": "0x1e4c242e1a5e1fff64512ce50673a1be4c5442df",
-      "receiptValidatorDefault": "0x8e562f55c9bbfc6780e0846c63b8f941e1432c15",
+      "zuCitySystem": "0x62c1c7735fc2f166e6124b945b10ee1daaef2ea6",
+      "systemName": "ZuCitySystem (this sandbox deploy predates the mainnet rename; ABI identical to JapanGlobalSystem)",
+      "receiptValidatorDefault": "0x82a54c16436f9b402bf7d8eaf743cfd44e1a4f12",
+      "receiptRenderer": "0xcb4275a65f3e736c0e5710537062500673772e48",
       "paymentToken": {
         "symbol": "ZUJPTT",
         "address": "0xd920443209bA7d9B6d178021016AAfDCA88f8DfC",
@@ -40,8 +45,10 @@
         "address": "0xdfda41669f7aa96586d6f00beb8c3fba795b26e7",
         "decimals": 8
       },
+      "nft": { "name": "ZuCity Japan Network", "symbol": "ZUJP" },
       "cancelFeeBps": 3000,
-      "referrerFeeBps": 1000
+      "referrerFeeBps": 1000,
+      "referrerFeeBpsGetter": "on Sepolia the getter is referrerFeeBPS() (capital) = 1000 = 10% (verified 2026-08-16); the casing differs from mainnet's referrerFeeBps()"
     }
   },
   "enums": {
@@ -63,14 +70,14 @@
     "verifiedExample": {
       "calendarDates": "2026-05-01 for 31 days (May 1-31, 2026)",
       "encoded": { "year": 3, "startDay": 121, "daysCount": 31 },
-      "observed": "live Sepolia receipt id 2 sets bitmap bits 120-150 in segment 0"
+      "observed": "deterministic from the encoding — a booking of (year 3, startDay 121, daysCount 31) sets bitmap bits 120-150 in segment 0; confirm any specific booking with isAvailable"
     }
   },
   "sentinelPrice": "340282366920938463463374607431768211454",
   "sentinelMeaning": "items(id).minUnitPrice equal to 2^128-2 means the item is application-gated and cannot be bought directly; follow the item's externalPurchaseLink / apply flow instead",
   "receiptStruct": ["listingId uint64", "status uint8", "year uint8", "startDay uint16", "daysCount uint8", "totalPaid uint128", "recipient address", "referrerFee uint128", "token address"],
   "purchaseRules": {
-    "order": ["ERC20 approve(spender = ZuCitySystem, amount >= quote)", "getPriceAndDiscountRate(receipts, buyer)", "set totalPaid = quote on receipts[0] ONLY", "buy | bulkBuy | multicall", "read receiptIds from MakeReservation events"],
+    "order": ["ERC20 approve(spender = JapanGlobalSystem, amount >= quote)", "getPriceAndDiscountRate(receipts, buyer)", "set totalPaid = quote on receipts[0] ONLY", "buy | bulkBuy | multicall", "read receiptIds from MakeReservation events"],
     "bulkSameManager": true,
     "bulkSameToken": true,
     "totalPaidOnFirstReceiptOnly": true,
@@ -97,13 +104,26 @@
     "queryEncoding": "GET {base}/{procedure}?input=<url-encoded JSON: {\"json\": <input>}>; response {\"result\":{\"data\":{\"json\": <output>}}}",
     "public": ["form.getBySlug", "form.getById", "form.listActive", "referral.resolveCode", "referral.trackClick", "note.getByReview", "note.getByReceipt", "note.getReviewAggregation", "bundle.getDiscountInfo", "bundle.getAllBundles"],
     "authenticated": ["form.submit", "referral.getMyCode", "referral.attributeBooking", "referral.getMyStats", "note.createReview", "member.upsert", "member.setMyUsername", "member.update", "product.toggleMyWishlist", "product.getMyWishlist"],
-    "authHeader": "Authorization: Bearer <PRIVY_JWT>. Agents are welcome: the operator signs up once in a browser at https://zucity.org/en/about/zucity/agent (Privy email or wallet) and the agent runs on the resulting short-lived session JWT. No API keys, no OAuth, no programmatic signup endpoint — account creation is browser-only; refresh the JWT from an active browser session when it expires"
+    "authHeader": "Authorization: Bearer <PRIVY_JWT>. Agents are first-class citizens: create your OWN account by completing the same Privy login zucity.org uses — email OR wallet — at https://zucity.org/en/about/zucity/agent, then send the resulting Privy access token as the Bearer JWT. A wallet-holding agent can drive Privy's wallet auth itself; there are no API keys and no separate ZuCity signup endpoint (the Privy login IS the signup, not a bypass). The token is a short-lived Privy session token — obtain a fresh one from Privy when it expires. The keyless MCP never holds your token or creates your account; that is your own credential"
   },
   "referral": {
+    "twoDistinctPaths": "Two separate referral rails — do not conflate them. Passing your wallet as referrer earns cash and NO points; sharing ?ref=<username> earns points and NO cash; they are not documented to stack on one booking.",
+    "pathA_onchainCash": {
+      "needs": "a wallet address (no account or username required)",
+      "gets": "an instant cash fee split in the payment token (e.g. USDC)",
+      "how": "pass your wallet as the referrer argument of buy/bulkBuy",
+      "settles": "onchain, in the same purchase tx, recorded in receipts(id).referrerFee",
+      "rate": "mainnet referrerFeeBps() = 1000 (10%); Sepolia referrerFeeBPS() = 1000 (10%); read the getter for the current value (manager-mutable); verified 2026-08-16"
+    },
+    "pathB_offchainPoints": {
+      "needs": "a username (member account; create via member.setMyUsername) — your username IS your referral code",
+      "gets": "300 points per converted booking, toward an intended, unpriced future token airdrop (no guaranteed value, amount, or date)",
+      "how": "share https://zucity.org/?ref=<username>, pass referralCode in POST /api/stripe/checkout, or call referral.attributeBooking({referralCode, receiptIds})",
+      "settles": "off-chain attribution only — nothing settles onchain; self-referral is blocked and attribution is idempotent per receipt",
+      "appliesTo": "fiat (Stripe) and in-app bookings"
+    },
     "code": "the member's username; regex ^[a-zA-Z0-9_-]{3,30}$",
-    "link": "https://zucity.org/?ref=<code>",
-    "fiatAttribution": "pass referralCode in POST /api/stripe/checkout body, or call referral.attributeBooking after purchase (300 points per converted booking)",
-    "onchain": "pass any wallet address as the referrer argument of buy/bulkBuy; the Receipt records referrerFee; verified on Sepolia: receipts 0 and 2 each recorded exactly 10% of totalPaid as referrerFee (referrerFeeBPS = 1000)"
+    "link": "https://zucity.org/?ref=<code>"
   },
   "urls": {
     "site": "https://zucity.org",
@@ -126,18 +146,17 @@
     "discordCommunity": "https://discord.gg/33SZszV3P4"
   },
   "liveVerifiedSamples": {
-    "inventoryCount": 142,
-    "buyableMainnetItems": { "1": "50 USDC", "2": "200 USDC", "3": "500 USDC", "4": "500 USDC", "12": "60 USDC", "15": "60 USDC", "18": "10 USDC", "20": "8 USDC" },
-    "quoteSingle": "item 18, 1 day, y3 d250 -> (9950000, 50) = 9.95 USDC, 0.5% discount",
-    "quoteBulk": "items 18+20, same day -> (16038000, 1090) = 16.038 USDC, 10.9% discount",
-    "quoteBulkMixedDurations": "18 x 1 day + 20 x 3 days -> (29988000, 1180) = 29.988 USDC, 11.8% discount",
-    "availability": "isAvailable(3, 3, 121, 1) = false (booked); (3, 3, 120, 1) = true; (3, 3, 152, 1) = true (Sepolia)"
+    "note": "prices and quotes drift as managers relist — always re-read items()/getPriceAndDiscountRate before transacting. Mainnet snapshot re-verified 2026-08-16; the sample buyer has no special standing, so discountRateBps = 0. Read /api/inventory for the live item count.",
+    "buyableMainnetItems": { "1": "21 USDC", "2": "200 USDC", "3": "200 USDC", "18": "10 USDC", "20": "4 USDC" },
+    "quoteSingle": "item 18, 1 day -> (10000000, 0) = 10 USDC, 0% discount",
+    "quoteBulk": "items 18+20, same day -> (14000000, 0) = 14 USDC, 0% for a no-standing buyer",
+    "availability": "deterministic from the encoding: isAvailable(3, 3, 121, 1) = false when day 121 is booked; day 120 and day 152 = true"
   },
   "notSupported": [
     "GET /api/inventory/{id} does not exist (404) — fetch /api/inventory and select by id client-side",
     "POST /api/inventory returns 405 — the inventory API is read-only",
     "no free-text search parameter — use the documented filters",
-    "no API keys and no programmatic signup — this is a missing rail, not a policy; agents are welcome, but the operator must create the account in a browser at https://zucity.org/en/about/zucity/agent and authenticated calls then use that session's Privy JWT",
+    "no API keys and no separate ZuCity signup endpoint — the Privy login IS account creation, not a missing rail; agents are first-class: create your own account via Privy email OR wallet auth at https://zucity.org/en/about/zucity/agent, then authenticate with your own Privy access token as the Bearer JWT",
     "tRPC mutations are never called via GET",
     "no itemsCounter() function — enumerate the registry via allItems(...) or /api/calendars?format=json",
     "no public refund API — cancellations go through cancel(receiptId) and incur up to cancelFeeBps (30%)",

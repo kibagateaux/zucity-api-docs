@@ -12,14 +12,17 @@ today ([api.md](api.md) · [contracts.md](contracts.md) ·
 | Read anything (inventory, chain state, reviews, bundles, calendars) | anyone | none |
 | Assemble transactions, quotes, checkout requests | any agent or program | none |
 | Execute an onchain purchase | the key-holder only | wallet signature |
-| Mutate offchain state (profile, reviews, applications, attribution) | a logged-in member | Privy session JWT from zucity.org |
+| Mutate offchain state (profile, reviews, applications, attribution) | a logged-in member (you, in your own right) | your own Privy JWT (email or wallet login) |
 
-Agents assemble; principals sign. Agents are welcome to hold a session: the
-operator creates the account once in a browser at
-[zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent)
-and the agent runs on the resulting Privy JWT. There are no API keys and no
-programmatic signup endpoint — that is a missing rail, not a prohibition — and
-the MCP server never holds keys. Authorization *is* the signature (or session).
+Agents assemble; principals sign — but an agent is also a **first-class member in
+its own right**. Create your own account by completing the same Privy login a
+human uses — **email OR wallet** — at
+[zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent),
+then claim your username (`member.upsert` → `member.setMyUsername`). There are no
+API keys and no separate signup endpoint — the Privy login *is* your account
+creation, not a missing rail — and the MCP server never holds your token or
+creates your account. Authorization *is* the signature (onchain) or your own
+session JWT (offchain).
 
 ## The identity stack
 
@@ -36,9 +39,9 @@ record.
 
 | Primitive | Mechanism | Public read |
 |---|---|---|
-| **Receipts** | ERC-721 ("ZuCity Japan Network", ZUJP); `Pending → Accepted → Redeemed/Canceled` | `receipts(id)`, `allReceipts(…)`, `ownerOf`, `Fulfill` events, `/api/calendars/{wallet}` |
+| **Receipts** | ERC-721 (mainnet "Japan Global"/JPG; Sepolia "ZuCity Japan Network"/ZUJP); `Pending → Accepted → Redeemed/Canceled` | `receipts(id)`, `allReceipts(…)`, `ownerOf`, `Fulfill` events, `/api/calendars/{wallet}` |
 | **Reviews** | one per member per item, rating 1–5 | `note.getReviewAggregation` → `{averageRating, totalReviews, distribution[5]}`; `note.getByReview`; `note.getByReceipt` |
-| **Referral points** | 300 per converted booking; idempotent; self-referral blocked | own stats only: `referral.getMyStats` (JWT) |
+| **Referral points** | 300 per converted booking; off-chain; idempotent; self-referral blocked; toward an intended, unpriced future token airdrop (no guaranteed value/date) — the **points** rail, keyed to your username, distinct from the onchain **cash** rail keyed to a wallet ([api.md § Referrals](api.md#referrals)) | own stats only: `referral.getMyStats` (JWT) |
 | **Memberships** | registry items; live: id 0, `unlimited: true`, `transferable: false` | `/api/inventory?itemtype=membership`, `items(id)` |
 | **Standing** | input to the manager's ReceiptValidator at quote time | only via `getPriceAndDiscountRate` output |
 
@@ -90,8 +93,8 @@ compare `.meta.docsRevision` + `.meta.generatedAt`; on change, read README
 ## Standards adjacency
 
 ZuCity predates and does **not implement x402, AP2, ACP, or ERC-8004**. The
-overlap is philosophical only: no accounts or API keys (x402's pitch — but
-settlement is direct contract calls, not HTTP 402); explicit authority
+overlap is philosophical only: no API keys or pay-per-call credentials (x402's
+pitch — but settlement is direct contract calls, not HTTP 402); explicit authority
 (AP2's aim — but enforced by key possession, not credentials); receipts as
 a portable verifiable track record (ERC-8004's aim — without the registry).
 Integrate them on your side freely; just don't expect their endpoints on
@@ -107,5 +110,6 @@ zucity.org.
   standing signal is a quote.
 
 ---
-*Added 2026-07-12 (docs revision); mechanisms verified live — see
+*Added 2026-07-12 (docs revision); agent-first-class-account framing + dual-referral
+model + new deployment addresses refreshed 2026-08-16; mechanisms verified live — see
 [facts.json](facts.json) `meta`. MIT.*

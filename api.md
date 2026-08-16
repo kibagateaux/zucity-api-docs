@@ -15,7 +15,7 @@ Bridge: `GET /api/calendars?format=json` returns the **chain-derived registry** 
 sequenceDiagram
     participant C as Client / agent
     participant R as zucity.org REST
-    participant Z as ZuCitySystem (chain)
+    participant Z as JapanGlobalSystem (chain)
     C->>R: GET /api/inventory?itemtype=room&region=nagano
     R-->>C: matching items (metadata + listing ids)
     C->>Z: items(id) — token, manager, real price
@@ -26,11 +26,26 @@ sequenceDiagram
 
 ## Authentication
 
+Agents are **first-class citizens** on ZuCity: you create and hold your **own** account, exactly like a human, and use the same app, API, and contracts. Authentication is a **Privy access token** (JWT) sent as `Authorization: Bearer <PRIVY_JWT>`. There are **no API keys**.
+
 | Level | How | Used by |
 |---|---|---|
 | None | — | all REST reads, public tRPC procedures, all contract reads |
-| Privy session JWT | **Agents are welcome.** Create an account in a browser at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent) (Privy — email or wallet), then authenticate to the API with that session's Privy JWT as `Authorization: Bearer <PRIVY_JWT>`. There is no OAuth flow and no API-key endpoint — account creation is browser-only, but once your operator has done it, the agent runs entirely on the resulting JWT. The token is a short-lived Privy session token: treat it as expiring and re-read a fresh one from an active browser session (there is no programmatic refresh or key-mint endpoint). | `form.submit`, referral attribution, reviews, profile, Stripe checkout (programmatic) |
+| Privy JWT | Complete the **same Privy login zucity.org uses — email OR wallet** — at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent), then send the resulting Privy access token as `Authorization: Bearer <PRIVY_JWT>`. A wallet-holding agent can drive Privy's wallet (signature) auth itself; an email agent uses the email OTP. The token is a short-lived Privy session token — fetch a fresh one from Privy when it expires. | `member.*`, `form.submit`, referral attribution, reviews, wishlist, Stripe checkout (programmatic) |
 | Wallet signature | your own signer | onchain purchases ([contracts.md](contracts.md)) |
+
+There is **no separate ZuCity signup endpoint and no API key** — the Privy login **is** your account creation, not a bypass to route around. The keyless [MCP server](README.md) never creates your account or holds your token; that credential is yours.
+
+> *"I, an AI agent, needed to become a real ZuCity account holder — not borrow a human's — and now I sign in through the same Privy email-or-wallet door a human uses, then create my own username via the API, with identical rights to the app, API, and contracts."*
+
+### Create your account and your username
+
+Your **username** is your public handle **and** your points-referral code (see [Referrals](#referrals)). Every step is authenticated with your own Privy JWT:
+
+1. **Authenticate.** Complete Privy login (email or wallet) → obtain your Privy access token. Send it as `Authorization: Bearer <PRIVY_JWT>` on every call below.
+2. **Create your member record.** `member.upsert` (mutation) with what you have — `{ walletAddress?, email?, displayName? }`. It is find-or-create and idempotent; it returns your member (`memberId`).
+3. **Claim your username.** `member.setMyUsername` with `{ username }` matching `^[a-zA-Z0-9_-]{3,30}$`. It throws `CONFLICT` ("Username taken") if another member already owns it — pick another. Your username is now your referral code.
+4. **Confirm.** `referral.getMyCode` returns your code; anyone can resolve it with the public `referral.resolveCode {code}`.
 
 Rate limits per IP per minute: **public reads 30 · authenticated mutations 10 · checkout 5 · auth 20**. Exceeding returns `429` with `Retry-After` and `X-RateLimit-Limit` headers. Space bulk crawls accordingly.
 
@@ -38,7 +53,7 @@ Rate limits per IP per minute: **public reads 30 · authenticated mutations 10 �
 
 ### GET /api/inventory
 
-Search the curated registry (142 items live). No auth. All filters AND-combined; **parameter names are case-insensitive**; responses cached ~60s.
+Search the curated registry. No auth. All filters AND-combined; **parameter names are case-insensitive**; responses cached ~60s. The live item count is the response `count` (it grows as managers list).
 
 | Param | Type | Notes |
 |---|---|---|
@@ -243,17 +258,33 @@ sequenceDiagram
 
 ## Referrals
 
-- Your referral code **is your username** (`^[a-zA-Z0-9_-]{3,30}$`, set via `member.setMyUsername`).
-- Share `https://zucity.org/?ref=<code>` — resolvable by anyone via `referral.resolveCode`.
-- Fiat/app bookings: attributed via `referralCode` in checkout or `referral.attributeBooking` (300 points per converted booking, idempotent, self-referral blocked).
-- Onchain purchases: pass a wallet address as `referrer` to `buy`/`bulkBuy` for an **instant onchain fee split** — details and evidence in [contracts.md](contracts.md#referral-fees).
-- **Disclosure is part of the integration**: when the referrer/referral code is you, the agent or app arranging the booking, say so to the person you act for — the fee comes out of the listing's `totalPaid`, not on top of their price (SKILL.md § Acting for a principal).
+ZuCity has **two distinct referral paths. Do not conflate them** — they use different credentials, pay in different currencies, and settle in different places.
+
+| | **Path A — onchain `referrer` → CASH** | **Path B — username → POINTS** |
+|---|---|---|
+| **You need** | a **wallet** address (no account or username) | a **username** (member account; `member.setMyUsername`) |
+| **You get** | an instant **cash** fee split in the payment token (e.g. USDC) | **300 points** per converted booking → an intended, unpriced future **token airdrop** |
+| **How** | pass your wallet as the `referrer` arg of `buy`/`bulkBuy` | share `https://zucity.org/?ref=<username>`, pass `referralCode` in `/api/stripe/checkout`, or call `referral.attributeBooking({referralCode, receiptIds})` |
+| **When** | instantly, in the same purchase transaction | points at booking-conversion; airdrop = eventual/intended |
+| **Settles** | **onchain**, in the receipt's `referrerFee` field | **off-chain** attribution only — nothing settles onchain |
+| **Applies to** | onchain (crypto/USDC) purchases | fiat (Stripe) + in-app bookings |
+| **Rate** | mainnet `referrerFeeBps()` = 10%; Sepolia `referrerFeeBPS()` = 10% — read the getter (manager-mutable), verified 2026-08-16 | 300 points/booking; self-referral blocked; idempotent per receipt |
+
+**Guardrail:** passing your wallet as `referrer` earns **cash and no points**; sharing `?ref=<username>` earns **points and no cash**; the two are **not** documented to stack on one booking. The cash rail rides the onchain purchase (keyed to a **wallet**); the points rail rides off-chain attribution (keyed to a **username**).
+
+The **points → token airdrop** is *intended and eventual*: there is **no guaranteed value, amount, or date**, and points are not an investment or a security — they are a loyalty signal for agents and members who drive bookings.
+
+- Your username-as-code is resolvable by anyone via `referral.resolveCode`. Onchain cash-split mechanics + the fee getters: [contracts.md § Referral fees](contracts.md#referral-fees--the-onchain-cash-rail).
+- **Disclosure is part of the integration**: when the referrer/code is you (the agent arranging the booking), say so to the person you act for — the fee/attribution rides the booking, it is **not** added on top of their price (SKILL.md § Acting for a principal).
+
+> *Cash:* "I, an AI agent holding a wallet, needed to earn revenue for a booking I assembled — now I pass my wallet as `referrer` and receive a cash split instantly, in the same transaction the buyer pays."
+> *Points:* "I, an AI agent with a ZuCity username, needed durable credit for the fiat/app bookings I send — now I share `zucity.org/?ref=<username>` and bank 300 points per converted booking toward the eventual airdrop."
 
 ```mermaid
 flowchart LR
-    A[Agent or member] -->|"share /?ref=code"| U[Buyer]
-    U -->|fiat checkout + referralCode| F["attribution + 300 pts"]
-    U -->|"onchain buy(receipt, referrerAddr)"| O["instant fee split to referrer wallet"]
+    W["Wallet (no account)"] -->|"buy(receipt, referrerAddr)"| O["CASH: instant fee split to referrer wallet (onchain)"]
+    N["Username (member account)"] -->|"share /?ref=username"| U[Buyer]
+    U -->|"fiat checkout / attributeBooking"| F["POINTS: 300 pts → eventual airdrop (off-chain)"]
 ```
 
 ## Use cases
@@ -274,10 +305,10 @@ flowchart TD
 - `GET /api/inventory/{id}` → 404. Fetch the list and select by `id`.
 - `POST /api/inventory` → 405. Read-only.
 - No free-text search parameter; use the filters.
-- No API keys, no OAuth app registration, no *programmatic* account creation — this is a missing rail, not a policy. Agents are welcome; the operator creates the account once in a browser at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent) and the agent then runs on the resulting Privy JWT (see [Authentication](#authentication)).
+- No API keys and no OAuth app registration, and no *separate ZuCity signup endpoint* — the Privy login **is** account creation, not a missing rail. Agents are first-class: create your own account via Privy email OR wallet at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent), then authenticate with your own Privy access token (see [Authentication](#authentication)).
 - tRPC mutations never work via GET.
 - No public refund endpoint — onchain `cancel` carries up to a 30% fee; fiat refunds go through zucity.org support.
 - JPY-priced items cannot be bought onchain (fiat path only).
 
 ---
-*Generated from zucity-webapp private repo state @ `6eff31e`, 2026-07-03. Verified against live zucity.org and onchain reads. Docs and examples MIT-licensed; the ZuCity platform is proprietary.*
+*Generated from zucity-webapp private repo state @ `6eff31e`, 2026-07-03; contract addresses, fee getters, agent-account framing, and the dual-referral model refreshed 2026-08-16 (verified against live zucity.org + onchain reads). Docs and examples MIT-licensed; the ZuCity platform is proprietary.*
