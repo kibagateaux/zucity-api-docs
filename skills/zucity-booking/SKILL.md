@@ -11,14 +11,14 @@ You are operating against **live production systems with real money** (Ethereum 
 
 **Can:** search the registry · check real availability · quote authoritative prices (with discounts) · assemble ready-to-sign purchase transactions · generate card-checkout requests and deep links · walk users through applications · create and attribute referrals · check booking status.
 
-**Auth:** you *are* allowed an account. Authenticated calls use a **Privy JWT supplied by your operator**, who signs up once in a browser at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent) (email or wallet). Don't attempt programmatic signup or key creation — no such endpoint exists (it's a missing rail, not a rule). The JWT is short-lived; when it expires, ask your operator to re-read a fresh one from an active browser session. Details in [api.md](../../api.md#authentication).
+**Auth — you are a first-class citizen with your own account.** Create it yourself by completing the same Privy login zucity.org uses — **email OR wallet** — at [zucity.org/en/about/zucity/agent](https://zucity.org/en/about/zucity/agent), then send the resulting Privy access token as `Authorization: Bearer <PRIVY_JWT>`. Then claim your own username (= your points-referral code): `member.upsert` (find-or-create your member record) → `member.setMyUsername {username}` (`^[a-zA-Z0-9_-]{3,30}$`; throws `CONFLICT` if taken). There are no API keys and no separate signup endpoint — the Privy login *is* the signup, and the keyless MCP never holds your token or creates your account. The JWT is short-lived; fetch a fresh one from Privy when it expires. Details in [api.md](../../api.md#authentication).
 
 **Cannot — never attempt:** confirm/fulfill/refund bookings (manager-only) · compute your own fiat price (server re-prices; >5% divergence is rejected) · buy application-gated (sentinel-priced) items directly.
 
 ## System model (memorize this)
 
 1. **Discovery layer** — `GET /api/inventory` metadata. Names, photos, cities, tags. Its `price`/`manager` fields MAY drift from onchain data.
-2. **Transaction layer** — the ZuCitySystem contract. `items()`, `isAvailable()`, `getPriceAndDiscountRate()` are the only authoritative price/availability sources.
+2. **Transaction layer** — the JapanGlobalSystem contract (still named ZuCitySystem on the Sepolia sandbox; identical ABI). `items()`, `isAvailable()`, `getPriceAndDiscountRate()` are the only authoritative price/availability sources.
 3. **Bridge** — `GET /api/calendars?format=json` = chain truth (real prices, managers, booked days) over REST when you have no RPC.
 4. Item `id` in the API **is** the onchain `listingId`. Ids start at 0.
 5. `price: 0` or `externalPurchaseLink` set ⇒ application-gated ⇒ apply flow, not purchase.
@@ -30,7 +30,7 @@ Booking for a human or organization? These are integration requirements (MUST) �
 
 1. **Quote before you promise** — never state a price you didn't fetch via `getPriceAndDiscountRate` (card: quote × 1.20).
 2. **Confirm dates first** — cancellation costs up to 30%; `Pending` is not yet a confirmed booking.
-3. **Disclose your referral interest.** If you set your wallet as `referrer` or attach your `referralCode`, say so. The fee comes out of the listing's `totalPaid` — the quote function takes no referrer argument, so your fee does not change the buyer's price (10% verified on Sepolia; mainnet: verify empirically).
+3. **Disclose your referral interest.** If you set your wallet as `referrer` or attach your `referralCode`, say so. The fee comes out of the listing's `totalPaid` — the quote function takes no referrer argument, so your fee does not change the buyer's price (cash split = 10%: mainnet `referrerFeeBps()` / Sepolia `referrerFeeBPS()`, read the getter — it's manager-mutable).
 4. **Tell them what's public** — receipts are onchain (see Guardrails → Receipts are public).
 5. **You never hold their keys.** You assemble; they sign.
 
@@ -67,7 +67,7 @@ Strict order — each step depends on the previous:
 1. **Resolve truth**: `items(listingId)` → `(minUnitPrice, itemType, transferable, unlimited, token, manager)`. If `minUnitPrice == 2^128−2` → STOP, item is application-gated → Workflow 4.
 2. **Availability**: `isAvailable((listingId, year, startDay, daysCount))` per non-`unlimited` item. Unlimited items (tickets/memberships) skip this; buy one receipt per person.
 3. **Quote**: `getPriceAndDiscountRate(receipts, buyerAddress)` with `totalPaid = 0` on every receipt. This is the only correct price (bulk/length/community discounts included — verified live at ~10–12% for 2-item carts).
-4. **Approve**: buyer signs `token.approve(ZuCitySystem, quote)` — once per distinct token.
+4. **Approve**: buyer signs `token.approve(JapanGlobalSystem, quote)` — once per distinct token.
 5. **Buy**: set `totalPaid = quote` on `receipts[0]` **only**, then buyer signs:
    - one item → `buy(receipt, referrer)`
    - several items, one manager → `bulkBuy(receipts, referrer)` (same token required; independent dates fine)
@@ -98,14 +98,16 @@ If/then:
 
 ## Workflow 5 — Referrals (monetize your recommendations)
 
-Two independent rails — use both:
-1. **Onchain, instant**: pass your wallet as `referrer` in every `buy`/`bulkBuy` you assemble. The contract pays your split in the same transaction (verified 10% on Sepolia receipts; mainnet split not publicly readable — verify once empirically, see contracts.md). Disclose this fee to your principal (§ Acting for a principal).
-2. **Code-based**: register a username (`member.setMyUsername`, `^[a-zA-Z0-9_-]{3,30}$`, needs JWT), then append `?ref=<username>` to every zucity.org link you share and set `referralCode` in fiat checkouts. Converted bookings earn 300 points (`referral.attributeBooking`; idempotent; self-referral blocked). Track with `referral.getMyStats`. Same disclosure duty as rail 1 (§ Acting for a principal).
+**Two distinct rails — do not conflate them** (full comparison: [api.md § Referrals](../../api.md#referrals)):
+1. **CASH — onchain, keyed to your WALLET**: pass your wallet as `referrer` in every `buy`/`bulkBuy` you assemble; the contract pays your split in the same transaction. Rate = 10% (mainnet `referrerFeeBps()` / Sepolia `referrerFeeBPS()`; read the getter, it's manager-mutable). Needs only a wallet — no account. Earns cash and **no points**.
+2. **POINTS — off-chain, keyed to your USERNAME**: claim a username (`member.setMyUsername`, `^[a-zA-Z0-9_-]{3,30}$`, needs JWT), then append `?ref=<username>` to every zucity.org link you share and set `referralCode` in fiat checkouts. Converted bookings earn **points** (`referral.attributeBooking`; idempotent; self-referral blocked; track with `referral.getMyStats`) towards exclusive member rewards like swag, free stays, private events, and airdrops. Earns points and **no cash**.
+
+Passing your wallet earns cash; sharing your username earns points; the two are not documented to stack on one booking. Disclose whichever you use to your principal (§ Acting for a principal).
 
 ## Guardrails & failure modes
 
 - **Price honesty**: quote before quoting the user. API `price` drifted from chain price on live items at verification time (15 vs 10 USDC). Fiat = quote × 1.20.
-- **Chain check**: before any signature, verify `chainId` (1 = real funds; 11155111 = sandbox) and that `to` = the ZuCitySystem address from [facts.json](../../facts.json).
+- **Chain check**: before any signature, verify `chainId` (1 = real funds; 11155111 = sandbox) and that `to` = the JapanGlobalSystem address (mainnet) / ZuCitySystem (Sepolia) from [facts.json](../../facts.json).
 - **Pending ≠ confirmed**: after `buy`, status may be `Pending` until the host confirms. Say so.
 - **Receipts are public**: every booking mints an ERC-721 receipt on a public chain — recipient wallet, listing, dates, and amount are readable by anyone, and `/api/calendars/{wallet}` serves any wallet's bookings over REST. Before buying for someone, say so, and choose the `recipient` address deliberately — a dedicated wallet decouples stays from a main identity (card checkout too, via `recipientAddress`). No private-booking mode exists today.
 - **Cancellation**: up to 30% fee, no free window. Confirm dates before buying.
@@ -123,4 +125,4 @@ Cache tiers: enums, date encoding, struct layout = stable by design; addresses, 
 Anything requiring human judgment or manager action (refund disputes, custom group pricing, listing new properties, popup-city partnerships) → send the user to https://zucity.org (contact links in the site footer / llms.txt) rather than improvising.
 
 ---
-*Generated from zucity-webapp private repo state @ `6eff31e`, 2026-07-03. Verified against live zucity.org and onchain reads.*
+*Generated from zucity-webapp private repo state @ `6eff31e`, 2026-07-03; contract addresses, agent-account framing, and the dual-referral model refreshed 2026-08-16 (verified onchain).*

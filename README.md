@@ -31,14 +31,14 @@ Claude Code: `claude mcp add zucity -- node /path/to/api-docs/zucity-mcp.js`
 ```mermaid
 flowchart LR
     A[Agent / app] -->|"search & display"| D["DISCOVERY: /api/inventory, llms.txt<br/>metadata — price/manager may drift"]
-    A -->|"quote & transact"| T["TRANSACTION: ZuCitySystem contract<br/>items · isAvailable · getPriceAndDiscountRate · buy"]
+    A -->|"quote & transact"| T["TRANSACTION: JapanGlobalSystem contract<br/>items · isAvailable · getPriceAndDiscountRate · buy"]
     A -->|"chain truth, no RPC"| B["BRIDGE: /api/calendars?format=json"]
     D -.->|"id = onchain listingId"| T
 ```
 
 Discover via REST, **transact via the chain** (or hand off to zucity.org). Never price a booking from discovery metadata — quote it.
 
-> 💸 **Agents get paid — in the open.** Pass your own wallet as `referrer` in an onchain purchase and the contract pays you a split **in the same transaction** (10% verified on Sepolia — real receipts on record; mainnet has no public fee getter — verify empirically). Card bookings attribute via `referralCode`. Disclose the fee to whoever you book for: it comes out of the listing's `totalPaid`, not added to their price ([SKILL.md → Acting for a principal](skills/zucity-booking/SKILL.md#acting-for-a-principal)). Details: [contracts.md → Referral fees](contracts.md#referral-fees).
+> 💸 **Agents get paid — two ways, don't conflate them.** *Cash* (onchain, keyed to your **wallet**): pass your wallet as `referrer` in an onchain purchase and the contract pays you a split **in the same transaction** — 10% (mainnet `referrerFeeBps()` / Sepolia `referrerFeeBPS()`; read the getter, verified 2026-08-16). *Points* (off-chain, keyed to your **username**): share `?ref=<username>` or attach `referralCode` and earn points toward exclusive member rewards — swag, free stays, private events, and airdrops. Disclose whichever you use — it comes out of the listing's `totalPaid`, not added to the buyer's price ([SKILL.md → Acting for a principal](skills/zucity-booking/SKILL.md#acting-for-a-principal)). Full table: [api.md → Referrals](api.md#referrals).
 
 ## Repo map
 
@@ -67,6 +67,7 @@ Every endpoint, address, enum value, and example in this repo was executed again
 
 ## Changes
 
+- **2026-08-16** — **new onchain deployment + first-class agent accounts + dual-referral refresh.** The mainnet booking contract was redeployed and renamed **ZuCitySystem → JapanGlobalSystem** (`0xe94320a13359dd9ec7b99d1a210d146583c5c90e`, ERC-721 "Japan Global" / JPG); a new **ReceiptRenderer** is deployed on both chains; every address was re-verified onchain (the old `0x9485…` / `0x1e4c…` systems are superseded). Docs now state agents are **first-class citizens** who create their own accounts via Privy **email OR wallet** (no operator required) and claim their own username via the tRPC `member.upsert` → `member.setMyUsername`. The **two referral paths** are delineated: onchain wallet → **cash** (10%, `referrerFeeBps()` / `referrerFeeBPS()`) vs url/username → **points** → exclusive member rewards (swag, free stays, private events, airdrops). `facts.json .meta.docsRevision` → 2026-08-16.
 - **2026-07-22** — agent harness + out-of-app integrations (docs revision; source state unchanged at `zucity-webapp@6eff31e`). **Supersedes** the root `skills.md` path: the operating manual is now the installable skill [`skills/zucity-booking/SKILL.md`](skills/zucity-booking/SKILL.md) (a pointer stub remains at `skills.md` — update cached URLs; content unchanged apart from relative-link depth and a standalone-install pointer). New: [`CLAUDE.md`](CLAUDE.md), [`MEMORY.md`](MEMORY.md), [`integrations.md`](integrations.md) (calendar subscribe, Luma event publishing, chat surfaces at verified status — no official chat bot exists as of 2026-07-22, see `facts.json .notSupported` — and run-your-own-agent), facts.json urls for calendar/Luma/Telegram/Discord + `.meta.docsRevision` bump.
 - **2026-07-12** — agent-era layer (docs revision; source state unchanged at `zucity-webapp@6eff31e`). **Supersedes** the repo's own address: self-links previously said `zucity/api-docs` (does not resolve) — canonical is `kibagateaux/zucity-api-docs`; update cached URLs. New: [`reputation.md`](reputation.md), [`AGENTS.md`](AGENTS.md), principal duties + privacy disclosure, llms.txt drift directive, MCP **0.2.0** (**12 tools**, was 9), `facts.json .meta.docsRevision`.
 - **2026-07-03** — initial release, generated from `zucity-webapp@6eff31e`. Supersedes any older integration notes you may have seen: the current registry has **11 item types** (not 6), no `itemsCounter()` function, and per-receipt independent dates in bulk purchases.
